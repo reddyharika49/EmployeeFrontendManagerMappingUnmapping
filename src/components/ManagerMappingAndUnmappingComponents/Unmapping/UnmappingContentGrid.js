@@ -1,102 +1,137 @@
-import React, { useState, useEffect } from 'react';
-import styles from '../Remapping/MainContentGrid.module.css';
-import EmployeeDetailsCard from '../EmployeeDetailsCard/EmployeeDetailsCard';
-import AddEmployeeWidget from 'widgets/ManagerMappingAndUnmappingWidgets/AddNewEmployee(Blank)/AddEmployeeWidget';
-import UnmappingForm from './UnmappingForm';
-import AddNewEmployeePopup from '../AddNewEmployeePopup/AddNewEmployeePopup';
-import { generateEmployee } from '../../../utils/employeeDataGenerator';
+import React, { useState, useEffect } from "react";
+import styles from "../Remapping/MainContentGrid.module.css";
 
-// ✅ Import missing assets/utilities
-import backarrow from 'assets/managermappingsearch/topleftarrow.svg';// adjust path as needed
-import { useNavigate } from 'react-router-dom';
+import EmployeeDetailsCard from "../EmployeeDetailsCard/EmployeeDetailsCard";
+import AddEmployeeWidget from "widgets/ManagerMappingAndUnmappingWidgets/AddNewEmployee(Blank)/AddEmployeeWidget";
+import UnmappingForm from "./UnmappingForm";
+import AddNewEmployeePopup from "../AddNewEmployeePopup/AddNewEmployeePopup";
 
-// Convert employee to grid format
-const convertEmployeeToGridFormat = (emp, idx) => {
-  const reportingManagers = ['Vamsi Ramana', 'Kavitha Rao', 'Ramesh Iyer', 'Sunita Desai', 'Amit Verma', 'Lakshmi Nair'];
-  const managers = ['Raja', 'Venkat', 'Kavitha Rao', 'Ramesh Iyer', 'Sunita Desai', 'Amit Verma'];
-  const managerIndex = idx % managers.length;
-  const reportingManagerIndex = idx % reportingManagers.length;
+import backarrow from "assets/managermappingsearch/topleftarrow.svg";
+import { useNavigate, useLocation } from "react-router-dom";
 
+import { fetchBatchCampusAddresses } from "api/managerMapping/managerMapping";
+
+/* 🔁 Merge selected card + API data (same pattern as Assign) */
+const convertEmployeeToGridFormat = (emp, apiData = {}) => {
   return {
-    id: emp.id || `HYD ${String(5627182 + idx).padStart(7, '0')}`,
-    name: emp.name || emp.employeeName || 'Unknown',
-    department: emp.dept || emp.department || 'IT Cell',
-    level: emp.level || 'Level 4',
-    type: emp.status || emp.type || 'Permanent',
+    id: emp.payRollId || emp.payrollId,
+
+    name: emp.empName || "—",
+    department: emp.departmentName || "—",
+    level: emp.employeeTypeName || "—",
+    type: emp.modeOfHiringName || "—",
+
+    phoneNumber: apiData.employeeMobileNo || null,
+    city: apiData.city || null,
+    cityId:apiData.cityId ||null,
+    email: emp.email || null,
+
     campus: {
-      name: 'Name Of The Campus',
-      address: 'Infinity Towers, Plot No 2-91/31, Near N Convention Road, HITEC City, Hyderabad, Telangana 500081'
+      name: emp.campusName || "—",
+      address: apiData.fullAddress || "—"
     },
-    reportingManager: reportingManagers[reportingManagerIndex],
-    manager: managers[managerIndex],
-    project: 'IPL'
+
+    reportingManager: apiData.reportingManagerName || "—",
+    managerId:apiData.managerId ||null,
+    manager: apiData.managerName || "—",
+    reportingManagerId:apiData.reportingManagerId ||null,
+
+    project: emp.projectName || "—"
   };
 };
 
-const UnmappingContentGrid = ({ initialEmployees = [] }) => {
+const UnmappingContentGrid = () => {
   const navigate = useNavigate();
+  const location = useLocation();
+  const goBack = () => navigate(-1);
 
-  // Initialize with provided employees or default to one generated employee
-  const initialEmployeesFormatted = initialEmployees.length > 0
-    ? initialEmployees.map((emp, idx) => convertEmployeeToGridFormat(emp, idx))
-    : [generateEmployee(0)];
+  const selectedEmployees = location.state?.selectedEmployees || [];
 
-  const [employees, setEmployees] = useState(initialEmployeesFormatted);
+  const [employees, setEmployees] = useState([]);
   const [isAddEmployeePopupOpen, setIsAddEmployeePopupOpen] = useState(false);
 
-  // Update employees when initialEmployees prop changes
+  /* 🔹 Initial load – selected employees */
   useEffect(() => {
-    if (initialEmployees.length > 0) {
-      const formatted = initialEmployees.map((emp, idx) => convertEmployeeToGridFormat(emp, idx));
-      setEmployees(formatted);
-    }
-  }, [initialEmployees]);
+    if (selectedEmployees.length === 0) return;
 
+    const payrollIds = selectedEmployees.map(emp => emp.payRollId);
+
+    fetchBatchCampusAddresses(payrollIds)
+      .then(res => {
+        const apiResponse = res.data || [];
+
+        const apiMap = {};
+        apiResponse.forEach(item => {
+          apiMap[item.payrollId] = item;
+        });
+
+        const mergedEmployees = selectedEmployees.map(emp =>
+          convertEmployeeToGridFormat(emp, apiMap[emp.payRollId])
+        );
+
+        setEmployees(mergedEmployees);
+      })
+      // .catch(err => {
+      //   console.error("Failed to fetch campus details", err);
+
+      //   // fallback – show selected card data only
+      //   const fallback = selectedEmployees.map(emp =>
+      //     convertEmployeeToGridFormat(emp)
+      //   );
+      //   setEmployees(fallback);
+      // });
+  }, [selectedEmployees]);
+
+  /* 🔹 Add employee popup */
   const handleAddEmployeeClick = () => {
     setIsAddEmployeePopupOpen(true);
   };
 
-  const handleAddEmployees = (selectedEmployees) => {
-    const reportingManagers = ['Vamsi Ramana', 'Kavitha Rao', 'Ramesh Iyer', 'Sunita Desai', 'Amit Verma', 'Lakshmi Nair'];
-    const managers = ['Raja', 'Venkat', 'Kavitha Rao', 'Ramesh Iyer', 'Sunita Desai', 'Amit Verma'];
+  /* 🔹 Add more employees (same API flow) */
+  const handleAddEmployees = (newSelectedEmployees) => {
+    const payrollIds = newSelectedEmployees.map(emp => emp.payRollId);
 
-    const newEmployees = selectedEmployees.map((emp, idx) => {
-      const managerIndex = (employees.length + idx) % managers.length;
-      const reportingManagerIndex = (employees.length + idx) % reportingManagers.length;
+    fetchBatchCampusAddresses(payrollIds)
+      .then(res => {
+        const apiMap = {};
+        res.data.forEach(item => {
+          apiMap[item.payrollId] = item;
+        });
 
-      return {
-        id: emp.id,
-        name: emp.name,
-        department: emp.dept,
-        level: emp.level,
-        type: emp.status,
-        campus: {
-          name: 'Name Of The Campus',
-          address: 'Infinity Towers, Plot No 2-91/31, Near N Convention Road, HITEC City, Hyderabad, Telangana 500081'
-        },
-        reportingManager: reportingManagers[reportingManagerIndex],
-        manager: managers[managerIndex],
-        project: 'IPL'
-      };
-    });
-    setEmployees([...employees, ...newEmployees]);
-  };
+        const formatted = newSelectedEmployees.map(emp =>
+          convertEmployeeToGridFormat(emp, apiMap[emp.payRollId])
+        );
 
-  const goBack = () => {
-    navigate(-1);
+        setEmployees(prev => [...prev, ...formatted]);
+      })
+      .catch(err => {
+        console.error("Failed to fetch additional employees", err);
+
+        const fallback = newSelectedEmployees.map(emp =>
+          convertEmployeeToGridFormat(emp)
+        );
+        setEmployees(prev => [...prev, ...fallback]);
+      });
   };
 
   return (
     <div className={styles.mainContentGrid}>
+      {/* Header */}
       <div className={styles.topRow}>
-        <img src={backarrow} alt="back" className={styles.backIcon} onClick={goBack} />
+        <img
+          src={backarrow}
+          alt="back"
+          className={styles.backIcon}
+          onClick={goBack}
+        />
         <div className={styles.modeheader}>
           <h2 className={styles.title}>Unmap Employees</h2>
           <p className={styles.subtitle}>Unmap each of employees</p>
         </div>
       </div>
+
+      {/* Grid */}
       <div className={styles.employeeGrid}>
-     
         {employees.map((employee, index) => (
           <div key={employee.id || index} className={styles.gridColumn}>
             <EmployeeDetailsCard employee={employee} />
@@ -107,14 +142,14 @@ const UnmappingContentGrid = ({ initialEmployees = [] }) => {
         <div className={styles.gridColumn}>
           <AddEmployeeWidget onClick={handleAddEmployeeClick} />
         </div>
-      
       </div>
+
+      {/* Popup */}
       <AddNewEmployeePopup
         isOpen={isAddEmployeePopupOpen}
         onClose={() => setIsAddEmployeePopupOpen(false)}
         onAddEmployees={handleAddEmployees}
       />
-    
     </div>
   );
 };

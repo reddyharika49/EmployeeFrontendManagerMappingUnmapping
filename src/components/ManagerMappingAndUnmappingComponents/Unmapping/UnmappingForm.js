@@ -1,65 +1,40 @@
-import React, { useState } from 'react';
-import styles from '../Remapping/RemappingForm.module.css';
-import Dropdown from 'widgets/Dropdown/Dropdown';
-import Inputbox from 'widgets/Inputbox/InputBox';
-import Button from 'widgets/Button/Button';
-import conformicon from 'assets/ManagerMappingAndUnmappingAssets/conformicon';
+import React, { useState, useEffect } from "react";
+import styles from "../Remapping/RemappingForm.module.css";
+import Inputbox from "widgets/Inputbox/InputBox";
+import Button from "widgets/Button/Button";
+import conformicon from "assets/ManagerMappingAndUnmappingAssets/conformicon";
+import { unmapEmployee } from "api/managerMapping/managerMapping";
 
 const UnmappingForm = ({ employee }) => {
   const [formData, setFormData] = useState({
-    toDate: '',
-    location: 'Hyderabad',
-    sharedCampuses: 'Infinity Towers',
-    manager: 'Venkat',
-    reportingManager: 'Venkat',
-    remarks: ''
+    payrollId: "",
+    cityId: null,
+    managerId: null,
+    reportingManagerId: null,
+    campusIds: [],
+
+    lastDate: "",
+    remark: ""
   });
 
-  const locations = ['Hyderabad', 'Bangalore', 'Mumbai', 'Delhi', 'Chennai', 'Pune'];
-  const sharedCampuses = ['Infinity Towers', 'Tech Park', 'Business Center', 'Corporate Hub'];
-  const managers = ['Venkat', 'Vamsi Ramana', 'Raja', 'Kavitha Rao', 'Ramesh Iyer', 'Sunita Desai'];
-  const reportingManagers = ['Venkat', 'Vamsi Ramana', 'Raja', 'Kavitha Rao', 'Ramesh Iyer', 'Sunita Desai'];
+  const [loading, setLoading] = useState(false);
 
-  // Define form fields configuration
-  const formFields = [
-    {
-      type: 'input',
-      name: 'toDate',
-      label: 'To Date',
-      inputType: 'date',
-      placeholder: 'Select Date'
-    },
-    {
-      type: 'dropdown',
-      name: 'location',
-      label: 'Location',
-      options: locations,
-      value: formData.location
-    },
-    {
-      type: 'dropdown',
-      name: 'sharedCampuses',
-      label: 'Shared Campuses',
-      options: sharedCampuses,
-      value: formData.sharedCampuses
-    },
-    {
-      type: 'dropdown',
-      name: 'manager',
-      label: 'Manager',
-      options: managers,
-      value: formData.manager
-    },
-    {
-      type: 'dropdown',
-      name: 'reportingManager',
-      label: 'Reporting Manager',
-      options: reportingManagers,
-      value: formData.reportingManager
-    }
-  ];
+  /* 🔹 Auto-fill IDs */
+  useEffect(() => {
+    if (!employee) return;
 
-  const handleInputChange = (e) => {
+    setFormData(prev => ({
+      ...prev,
+      payrollId: employee.id,
+      cityId: employee.cityId || 322,
+      managerId: employee.managerId,
+      reportingManagerId: employee.reportingManagerId,
+      campusIds: employee.campus?.id ? [employee.campus.id] : []
+
+    }));
+  }, [employee]);
+
+  const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData(prev => ({
       ...prev,
@@ -67,68 +42,72 @@ const UnmappingForm = ({ employee }) => {
     }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    // Handle form submission
-    console.log('Unmapping form submitted:', formData);
+  
+    if (!employee.campusId) {
+      alert("Campus mapping not found. Please reselect employee.");
+      return;
+    }
+  
+    const payload = {
+      payrollId: employee.id,
+      cityId: employee.cityId,
+      campusIds: [employee.campusId], // ✅ guaranteed non-null
+      managerId: employee.managerId,
+      reportingManagerId: employee.reportingManagerId,
+      lastDate: new Date(formData.lastDate).toISOString(),
+      remark: formData.remark,
+      updatedBy: 1
+    };
+  
+    await unmapEmployee(payload);
   };
+  
 
   return (
     <div className={styles.remappingFormSection}>
       <h3 className={styles.remappingTitle}>Un-Mapping</h3>
+
       <form className={styles.remappingForm} onSubmit={handleSubmit}>
-        {formFields.map((field) => (
-          <div key={field.name} className={styles.formGroup}>
-            {field.type === 'dropdown' ? (
-              <Dropdown
-                dropdownname={field.label}
-                results={field.options}
-                value={field.value}
-                name={field.name}
-                onChange={handleInputChange}
-                dropdownsearch={false}
-              />
-            ) : (
-              <Inputbox
-                label={field.label}
-                id={field.name}
-                name={field.name}
-                type={field.inputType}
-                value={formData[field.name]}
-                onChange={handleInputChange}
-                placeholder={field.placeholder}
-                inputRule="none"
-              />
-            )}
-          </div>
-        ))}
+        <Inputbox
+          label="To Date"
+          name="lastDate"
+          type="date"
+          value={formData.lastDate}
+          onChange={handleChange}
+          required
+        />
+
+        <Inputbox label="Location" value={employee.city || "—"} disabled />
+        <Inputbox label="Shared Campus" value={employee.campus?.name || "—"} disabled />
+        <Inputbox label="Manager" value={employee.manager || "—"} disabled />
+        <Inputbox
+          label="Reporting Manager"
+          value={employee.reportingManager || "—"}
+          disabled
+        />
 
         <div className={styles.formGroup}>
-          <label htmlFor="remarks">Remarks</label>
+          <label>Remarks</label>
           <textarea
-            id="remarks"
-            name="remarks"
-            value={formData.remarks}
-            onChange={handleInputChange}
-            placeholder="Enter Remarks"
-            rows="4"
+            name="remark"
+            value={formData.remark}
+            onChange={handleChange}
+            rows="3"
+            placeholder="Enter remark"
           />
         </div>
 
         <div className={styles.formActions}>
           <Button
-                buttonname="Confirm"
-                type="submit"
-                variant="primary"
-                righticon={conformicon || (
-                  // Fallback inline white checkmark in circle
-                  <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <circle cx="10" cy="10" r="9" stroke="white" strokeWidth="2"/>
-                    <path d="M6 10L9 13L14 7" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                  </svg>
-                )}
-                width="142px" // Adjust as needed
-              />
+            buttonname={loading ? "Processing..." : "Confirm"}
+            type="submit"
+            variant="primary"
+            disabled={loading}
+            righticon={conformicon}
+            width="142px"
+          />
         </div>
       </form>
     </div>
@@ -136,4 +115,3 @@ const UnmappingForm = ({ employee }) => {
 };
 
 export default UnmappingForm;
-

@@ -129,3 +129,26 @@ export const getCampusesByLocation = async (locationId) => {
       `${MAPPING_BASE_URL}/batch-campus-address`,
       payrollIds
     );};
+
+    export const mapEmployee = async (payload) => {
+      const res = await axios.post(
+        "http://localhost:8080/api/manager-mapping/map-employees",
+        payload
+      );
+      return res.data;
+    };
+
+    export const mapEmployeeGroup = async (payload) => {
+      const res = await axios.post(
+        "http://localhost:8080/api/manager-mapping/map-multiple-employees",
+        payload
+      );
+      return res.data;
+    };
+
+    export const unmapEmployee = (payload) => {
+      return axios.post(
+        "http://localhost:8080/api/manager-mapping/unmap-employee",
+        payload
+      );
+    };

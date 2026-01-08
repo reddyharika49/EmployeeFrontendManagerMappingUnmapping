@@ -84,3 +84,18 @@
   margin-top: 20px;
   margin-right: 105px;
 }
+
+.footer {
+  position: sticky;
+  bottom: 0;
+ background: linear-gradient(180deg, rgba(255, 255, 255, 0.70) -24.39%, #FFF 30.02%);
+  padding: 16px 24px;
+  /* border-top: 1px solid #e6e6e6; */
+  z-index: 10;
+}
+
+.footerActions {
+  display: flex;
+  justify-content: center;
+  gap: 16px;
+}

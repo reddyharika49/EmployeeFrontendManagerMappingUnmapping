@@ -170,30 +170,31 @@ useEffect(() => {
 
       </div>
 
-      {/* Buttons - Next always enabled */}
-      <div className={styles.buttonRow}>
-        <Button
-          buttonname="Cancel"
-          type="button"
-          variant="secondary"
-          width="108px"
-          onClick={() => setSelectedEmployees([])}
-        />
+ {/* Footer */}
+<div className={styles.footer}>
+  <div className={styles.footerActions}>
+    <Button
+      buttonname="Cancel"
+      type="button"
+      variant="secondary"
+      width="108px"
+      onClick={() => setSelectedEmployees([])}
+    />
 
-<Button
-  buttonname="Next"
-  type="button"
-  righticon={rightarrow}
-  variant="primary"
-  width="123px"
-  onClick={() =>
-    navigate("/scopes/employee/employeeManager/mapping-mode", {
-      state: { selectedEmployees }
-    })
-  }
-/>
-
-      </div>
+    <Button
+      buttonname="Next"
+      type="button"
+      righticon={rightarrow}
+      variant="primary"
+      width="123px"
+      onClick={() =>
+        navigate("/scopes/employee/employeeManager/mapping-mode", {
+          state: { selectedEmployees }
+        })
+      }
+    />
+  </div>
+</div>
     </div>
   );
 };
