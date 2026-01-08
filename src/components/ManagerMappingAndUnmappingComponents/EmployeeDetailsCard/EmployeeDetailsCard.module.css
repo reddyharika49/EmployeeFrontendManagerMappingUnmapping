@@ -1,0 +1,370 @@
+.employeeDetailsCard {
+  background: #FFFFFF;
+  border: 1px solid #E2E2E2;
+  border-radius: 12px;
+  padding: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.employeeDetailsCard:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.employeeHeader {
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+}
+
+.employeeProfile {
+  flex-shrink: 0;
+}
+
+.employeeProfile figure {
+  margin: 0;
+  padding: 0;
+}
+
+.profileImage {
+  width: 106px;
+  height: 106px;
+  border-radius: 180px;
+}
+
+.employeeInfo {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.employeeId {
+  font-weight: 400;
+  font-size: 14px;
+  color: #323232;
+  border-radius: 4px;
+}
+
+.employeeName {
+  font-weight: 700;
+  font-size: 18px;
+  color: #000000;
+}
+
+.employeeDepartment {
+  font-weight: 400;
+  font-size: 14px;
+  color: #323232;
+}
+
+.employeeTags {
+  display: flex;
+  gap: 10px;
+  margin-top: 4px;
+}
+
+.tag {
+  padding: 4px 12px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 500;
+  color: white;
+}
+
+.tagLevel {
+  width: 50px;
+  height: 20px;
+  border-radius: 4px;
+  background: #C7C3FF;
+  border: 1px solid #3425FF;
+  border-width: 1px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  white-space: nowrap;
+  font-weight: 600;
+  font-size: 12px;
+  color: #3425FF;
+}
+
+.tagPermanent {
+  width: 72px;
+  height: 20px;
+  border-radius: 4px;
+  padding-top: 2px;
+  padding-right: 6px;
+  padding-bottom: 2px;
+  padding-left: 6px;
+  background: #C0FAB3;
+  border: 1px solid #118D19;
+  border-width: 1px;
+  opacity: 1;
+  transform: rotate(0deg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  white-space: nowrap;
+  font-weight: 600;
+  font-size: 12px;
+  line-height: 100%;
+  letter-spacing: 0px;
+  color: #118D19;
+}
+
+.campusDetailsWrapper {
+  display: flex;
+  flex-direction: column;
+  border-radius: 8px;
+  border: 1px solid #E2E2E2;
+}
+
+.campusDetailsSection {
+  display: flex;
+  flex-direction: column;
+  padding: 10px 10px 0px 10px;
+  transition: gap 0.3s ease;
+}
+
+.campusDetailsSectionCollapsed {
+  gap: 0;
+}
+
+.currentCampusSection {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  width: 100%;
+}
+
+.campusLeft {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  flex: 1;
+  min-width: 0;
+  transition: gap 0.3s ease;
+}
+
+.campusTopRow {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+}
+
+.campusIcon {
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.campusIcon figure {
+  margin: 0;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.campusIconImage {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.campusTitleRow {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  flex: 1;
+  min-width: 0;
+}
+
+.campusLabel {
+  font-weight: 600;
+  font-size: 11px;
+  color: #5A5A5A;
+  border-radius: 4px;
+}
+
+.campusName {
+  font-weight: 600;
+  font-size: 12px;
+  color: #262626;
+}
+
+.campusAddress {
+  font-weight: 600;
+  font-size: 10px;
+  color: #626262;
+  max-height: 100px;
+  overflow: hidden;
+  transition: max-height 0.3s ease, opacity 0.3s ease, margin 0.3s ease, padding 0.3s ease;
+  opacity: 1;
+}
+
+.campusAddressHidden {
+  max-height: 0;
+  opacity: 0;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  line-height: 0;
+}
+
+.campusIcons {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  flex-shrink: 0;
+  justify-content: flex-end;
+}
+
+.iconCircle {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background-color: #ECECEC;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.iconCircle figure {
+  margin: 0;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.iconImage {
+  width: 12px;
+  height: 12px;
+  object-fit: contain;
+}
+
+.iconRemap {
+  background: #3425FF;
+}
+
+.iconRemapCollapsed {
+  background: #ECECEC;
+}
+
+.reportingManagerSection {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: 10px;
+  border-radius: 5px;
+  border: 1px solid #3425FF;
+  border-width: 1px;
+  gap: 10px;
+  background: #E8E6FF;
+  padding: 18px;
+  font-size: 14px;
+  height: 10px;
+  overflow: hidden;
+  transition: max-height 0.3s ease, opacity 0.3s ease, margin 0.3s ease, padding 0.3s ease;
+}
+
+.managerLeft {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.managerRight {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.reportingManagerSectionHidden {
+  max-height: 0;
+  opacity: 0;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  min-height: 0;
+}
+
+.managerLabel {
+  font-weight: 600;
+  font-size: 12px;
+  color: #262626;
+}
+
+.managerName {
+  font-weight: 700;
+  font-size: 12px;
+  color: #262626;
+}
+
+.managerPhoneIcon {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background-color: #3425FF;
+  border: 1px solid #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+.managerPhoneIcon figure {
+  margin: 0;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.managerPhoneIcon .iconImage {
+  filter: brightness(0) invert(1);
+}
+
+.bottomBar {
+  font-weight: 600;
+  font-size: 10px;
+  color: #FFFFFF;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  border-radius: 4px;
+  margin-top: 8px;
+  margin-left: 0px;
+  height: 20px;
+  background: #3425FF;
+}
+
+.bottomBarHidden {
+  max-height: 0;
+  opacity: 0;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  min-height: 0;
+  border: none;
+}
+
+.decorativeLine {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+

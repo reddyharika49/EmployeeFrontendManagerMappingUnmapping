@@ -1,0 +1,65 @@
+.mainContentGrid {
+  /* display: grid; */
+ 
+  width: 100%;
+  min-height: 400px;
+  grid-auto-flow: column;
+  grid-auto-columns: 390px;
+  overflow-x: auto;
+  overflow-y: hidden;
+  scroll-behavior: smooth;
+}
+.topRow {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 10px;
+}
+
+.title {
+  margin: 0;
+  font-size: 24px;
+  font-weight: 700;
+}
+
+.subtitle {
+  margin: 0;
+  font-size: 12px;
+  color: #707070;
+}
+.mainContentGrid::-webkit-scrollbar {
+  height: 8px;
+}
+
+.mainContentGrid::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 4px;
+}
+
+.mainContentGrid::-webkit-scrollbar-thumb {
+  background: #888;
+  border-radius: 4px;
+}
+
+.mainContentGrid::-webkit-scrollbar-thumb:hover {
+  background: #555;
+}
+
+.gridColumn {
+  display: flex;
+  flex-direction: column;
+  min-height: 400px;
+  padding: 10px;
+  border-radius: 8px;
+  width: 390px;
+  background: #F3F6FF;
+}
+.employeeGrid{
+display: flex;
+/* flex-direction: row; */
+/* grid-template-rows: repeat(4,1fr); */
+gap: 10px;
+padding: 10px;
+border-top: 1px solid #E5E9EB;
+}
+

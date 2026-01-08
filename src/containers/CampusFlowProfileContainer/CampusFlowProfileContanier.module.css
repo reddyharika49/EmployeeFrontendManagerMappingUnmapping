@@ -1,0 +1,13 @@
+.Campus_profile_container {
+  display: flex;
+  align-items: flex-start;
+  gap: 40px;
+ border-radius: 8px;
+/* border: 1px solid #DDD; */
+background: #F9F9F9;
+  padding: 19px 16px;
+  background-image:     url("../../assets/EmployeeProfileCrad/application_search_background.png");
+  background-repeat: no-repeat;
+  background-position: right bottom;
+  background-size: 100% 100%;
+}

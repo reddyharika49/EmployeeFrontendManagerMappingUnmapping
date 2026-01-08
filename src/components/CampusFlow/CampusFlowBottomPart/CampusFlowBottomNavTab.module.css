@@ -1,0 +1,56 @@
+.wrapper {
+  background: #ffffff;
+  padding: 8px 12px;
+}
+
+/* Top row */
+.topBar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+/* Tabs container */
+.tabs {
+  display: flex;
+  gap: 6px;                 /* tighter spacing */
+  overflow-x: auto;
+  padding-bottom: 4px;
+}
+
+/* Hide scrollbar */
+.tabs::-webkit-scrollbar {
+  display: none;
+}
+.tabs {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+/* Individual tab (pill style) */
+.tab {
+  padding: 6px 12px;
+  border-radius: 6px;     /* FULL pill */
+  border: none;
+  background: transparent;
+  font-size: 12px;
+  font-weight: 500;
+  color: #1f2937;           /* dark gray */
+  cursor: pointer;
+  white-space: nowrap;
+  text-decoration: none;
+  transition: all 0.2s ease;
+}
+
+/* Hover effect */
+.tab:hover {
+  background: #3425FF;      /* light gray hover */
+  color:#ffffff;
+}
+
+/* Active tab */
+.activeTab {
+  background: #3425FF;      /* blue */
+  color: #ffffff;
+}

@@ -1,0 +1,15 @@
+.heading{
+    font-size: 18px;
+    font-weight: 700;
+    color: #010101;
+}
+.CampusContainer{
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+.EmployeeCardContainer{
+    display: flex;
+    flex-direction: row;
+    gap: 15px;
+}

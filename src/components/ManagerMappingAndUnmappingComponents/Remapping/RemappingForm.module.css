@@ -1,0 +1,167 @@
+.remappingFormSection {
+  margin-top: 16px;
+}
+
+.remappingTitle {
+  font-size: 16px;
+  font-weight: 600;
+  color: #262626;
+  margin: 0 0 16px 0;
+  padding: 0;
+}
+
+.remappingForm {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.formGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.formGroup label {
+  font-size: 14px;
+  font-weight: 500;
+  color: #344054;
+}
+
+.formGroup input[type="date"],
+.formGroup textarea {
+  padding: 12px 14px;
+  border: 1px solid #C3C3C3;
+  border-radius: 8px;
+  font-size: 14px;
+  font-family: inherit;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.formGroup input[type="date"]:focus,
+.formGroup textarea:focus {
+  outline: none;
+  border-color: #3425FF;
+  box-shadow: 0 0 0 3px rgba(52, 37, 255, 0.1);
+}
+
+.formGroup textarea {
+  resize: vertical;
+  min-height: 100px;
+}
+
+.selectedCampusesSection {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.selectedCampusesLabel {
+  font-size: 14px;
+  font-weight: 500;
+  color: #344054;
+}
+
+.selectedCampusesList {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.campusChip {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 7px;
+  background: #FFFFFF;
+  border-radius: 8px;
+  border: 1px solid #E0E0E0;
+}
+
+.campusChipIcon {
+  width: 40px;
+  height: 40px;
+  background: #3425FF;   /* blue background */
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+
+.campusChipIcon img {
+  width: 24px;
+  height: 24px;
+}
+
+.campusChipContent {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 0px;
+  min-width: 0;
+}
+
+.campusChipLabel {
+  font-size: 12px;
+  font-weight: 600;
+  color: #323232;
+}
+
+.campusChipName {
+  font-size: 14px;
+  font-weight: 700;
+  color: #000000;
+}
+
+.campusChipClose {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: #E3E3E3;
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-size: 18px;
+  color: #1A1A1A;
+  flex-shrink: 0;
+  transition: background-color 0.2s;
+}
+
+.campusChipClose:hover {
+  background: #D0D0D0;
+}
+
+.formActions {
+  display: flex;
+  justify-content: center;
+  margin-top: 8px;
+}
+
+.confirmButton {
+  background: #3425FF;
+  color: #FFFFFF;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transition: background-color 0.2s;
+}
+
+.confirmButton:hover {
+  background: #2a1ecc;
+}
+
+.confirmButton:active {
+  background: #1f16a6;
+}
+

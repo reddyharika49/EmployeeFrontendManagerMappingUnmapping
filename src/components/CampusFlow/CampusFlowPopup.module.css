@@ -1,0 +1,44 @@
+.popupContainer {
+  width: 358px;
+  /* min-height: 356px; */
+  background: #fff;
+  border:1px solid #D7D7D7;
+border-radius: 8px;
+gap:5px;
+}
+
+/* Header bar */
+.header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 15px 5px 15px;
+}
+
+.backIcon {
+  width: 24px;
+  height: 24px;
+  cursor: pointer;
+}
+
+.title {
+  font-size: 20px;
+  font-weight: 600;
+  margin: 0;
+}
+
+.content {
+  padding: 5px 15px 15px 15px;
+  max-width: 400px;
+  display: flex; /* Make the container a flex container */
+  flex-direction: column; /* Stack the child elements vertically */
+  gap: 5px; /* Add space between elements */
+}
+
+.buttonContainer{
+    display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 10px ;
+  height:40px;
+}
