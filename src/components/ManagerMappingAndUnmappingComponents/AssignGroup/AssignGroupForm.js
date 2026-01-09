@@ -15,25 +15,30 @@ import {
   getCampusesByLocation,
   getDepartments,
   getDesignationsByDepartment,
-  getEmployeesByDepartmentAndCampus,
+  getEmployeesByCampus,
   mapEmployeeGroup
 } from "api/managerMapping/managerMapping";
 
 /* =========================
    HELPERS
 ========================= */
-const getIdByName = (list, name) =>
-  list.find(item => item.name === name)?.id;
+const getIdByName = (list = [], name = "") =>
+  list.find(item => item.name === name)?.id || 0;
 
 const AssignGroupForm = () => {
   const navigate = useNavigate();
   const location = useLocation();
 
   /* =========================
-     ROUTE STATE (SOURCE OF TRUTH)
+     ROUTE STATE
   ========================= */
   const payrollIds = location.state?.payrollIds || [];
   const selectedEmployees = location.state?.selectedEmployees || [];
+
+  /* =========================
+     ERROR STATE (NEW ✅)
+  ========================= */
+  const [error, setError] = useState("");
 
   /* =========================
      FORM STATE
@@ -50,7 +55,7 @@ const AssignGroupForm = () => {
   });
 
   /* =========================
-     DROPDOWN DATA
+     MASTER DATA
   ========================= */
   const [locations, setLocations] = useState([]);
   const [campuses, setCampuses] = useState([]);
@@ -62,22 +67,92 @@ const AssignGroupForm = () => {
      SELECTED CAMPUSES
   ========================= */
   const [selectedCampuses, setSelectedCampuses] = useState([]);
-  const [campusIdCounter, setCampusIdCounter] = useState(1);
 
   /* =========================
      INITIAL LOAD
   ========================= */
   useEffect(() => {
-    const loadInitialData = async () => {
+    const init = async () => {
       const cityRes = await getCities();
-      setLocations(cityRes || []);
-
       const deptRes = await getDepartments();
+
+      setLocations(cityRes || []);
       setDepartments(deptRes || []);
     };
 
-    loadInitialData();
+    init();
   }, []);
+
+  /* =========================
+     VALIDATE SELECTED EMPLOYEES (NEW ✅)
+  ========================= */
+  useEffect(() => {
+    if (!selectedEmployees.length) {
+      setError("No employees selected");
+      return;
+    }
+
+    const ref = selectedEmployees[0];
+
+    const isSame = selectedEmployees.every(emp =>
+      emp.locationName === ref.locationName &&
+      emp.campusName === ref.campusName
+    );
+
+    if (!isSame) {
+      setError(
+        "Selected employees do not belong to the same Location / Campus"
+      );
+      return;
+    }
+
+    /* AUTO-POPULATE */
+    setFormData(prev => ({
+      ...prev,
+      location: ref.locationName || "",
+      campus: ref.campusName || ""
+    }));
+
+    setError("");
+  }, [selectedEmployees]);
+
+  /* =========================
+     LOAD CAMPUSES
+  ========================= */
+  useEffect(() => {
+    if (!formData.location || error) return;
+
+    const cityId = getIdByName(locations, formData.location);
+    if (!cityId) return;
+
+    const loadCampuses = async () => {
+      const res = await getCampusesByLocation(cityId);
+      setCampuses(res || []);
+    };
+
+    loadCampuses();
+  }, [formData.location, locations, error]);
+
+  /* =========================
+     FETCH EMPLOYEES BY CAMPUS
+  ========================= */
+  useEffect(() => {
+    if (!formData.campus || !campuses.length || error) return;
+
+    const campusId = getIdByName(campuses, formData.campus);
+    if (!campusId) return;
+
+    const loadEmployees = async () => {
+      const res = await getEmployeesByCampus(campusId);
+      setEmployees(res || []);
+    };
+
+    loadEmployees();
+
+    setSelectedCampuses([
+      { campusId, name: formData.campus }
+    ]);
+  }, [formData.campus, campuses, error]);
 
   /* =========================
      INPUT HANDLER
@@ -90,99 +165,17 @@ const AssignGroupForm = () => {
       [name]: value
     }));
 
-    /* LOCATION → CAMPUSES */
-    if (name === "location") {
-      setFormData(prev => ({
-        ...prev,
-        campus: "",
-        department: "",
-        position: "",
-        manager: "",
-        reportingManager: ""
-      }));
-
-      setCampuses([]);
-      setPositions([]);
-      setEmployees([]);
-      setSelectedCampuses([]);
-
-      if (value) {
-        const cityId = getIdByName(locations, value);
-        if (!cityId) return;
-
-        const campusRes = await getCampusesByLocation(cityId);
-        setCampuses(campusRes || []);
-      }
-    }
-
-    /* CAMPUS SELECTION (MULTI) */
-    if (name === "campus" && value) {
-      const exists = selectedCampuses.some(c => c.name === value);
-      if (exists) return;
-
-      const selectedCampus = campuses.find(c => c.name === value);
-      if (!selectedCampus) return;
-
-      setSelectedCampuses(prev => [
-        ...prev,
-        {
-          id: campusIdCounter,
-          campusId: selectedCampus.id,
-          name: selectedCampus.name
-        }
-      ]);
-
-      setCampusIdCounter(prev => prev + 1);
-
-      if (formData.department) {
-        const departmentId = getIdByName(departments, formData.department);
-        await fetchEmployees(departmentId, selectedCampus.id);
-      }
-    }
-
-    /* DEPARTMENT → DESIGNATIONS + EMPLOYEES */
     if (name === "department") {
       setPositions([]);
-      setEmployees([]);
 
-      if (value && selectedCampuses.length > 0) {
-        const departmentId = getIdByName(departments, value);
-        if (!departmentId) return;
+      if (!value) return;
 
-        const desigRes = await getDesignationsByDepartment(departmentId);
-        setPositions(desigRes || []);
+      const deptId = getIdByName(departments, value);
+      if (!deptId) return;
 
-        await fetchEmployees(departmentId, selectedCampuses[0].campusId);
-      }
+      const res = await getDesignationsByDepartment(deptId);
+      setPositions(res || []);
     }
-  };
-
-  /* =========================
-     FETCH EMPLOYEES
-  ========================= */
-  const fetchEmployees = async (departmentId, campusId) => {
-    if (!departmentId || !campusId) return;
-
-    const empRes = await getEmployeesByDepartmentAndCampus(
-      departmentId,
-      campusId
-    );
-
-    setEmployees(
-      (empRes || []).map(emp => ({
-        id: emp.empId,
-        name: emp.empName
-      }))
-    );
-  };
-
-  /* =========================
-     REMOVE CAMPUS CHIP
-  ========================= */
-  const handleRemoveCampus = (id) => {
-    setSelectedCampuses(prev =>
-      prev.filter(campus => campus.id !== id)
-    );
   };
 
   /* =========================
@@ -190,85 +183,38 @@ const AssignGroupForm = () => {
   ========================= */
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (error) return;
 
     if (!formData.workingStartDate) {
       alert("Please select Working Start Date");
       return;
     }
 
-    if (payrollIds.length === 0) {
-      alert("No employees selected");
-      return;
-    }
-
-    const workStartDate = new Date(formData.workingStartDate);
-    if (isNaN(workStartDate.getTime())) {
-      alert("Invalid Working Start Date");
-      return;
-    }
-
     const payload = {
       cityId: getIdByName(locations, formData.location),
 
-      campusMappings: selectedCampuses.map(campus => ({
-        campusId: campus.campusId,
+      campusMappings: selectedCampuses.map(c => ({
+        campusId: c.campusId,
         departmentId: getIdByName(departments, formData.department),
-        subjectId: 0,
-        designationId: getIdByName(positions, formData.position)
+        designationId: getIdByName(positions, formData.position),
+        subjectId: 0
       })),
 
-      payrollIds, // ✅ FROM ROUTE STATE
-
+      payrollIds,
       managerId: getIdByName(employees, formData.manager),
       reportingManagerId: getIdByName(employees, formData.reportingManager),
-
-      workStartingDate: workStartDate.toISOString(),
+      workStartingDate: new Date(formData.workingStartDate).toISOString(),
       remark: formData.remarks,
       updatedBy: 5212
     };
 
-    console.log("✅ FINAL PAYLOAD", payload);
-
     try {
       await mapEmployeeGroup(payload);
-      alert("Employees mapped successfully ✅");
       navigate(-1);
     } catch (err) {
-      console.error("❌ Mapping failed", err);
-      alert("Failed to map employees");
+      setError(err?.response?.data?.message || "Mapping failed");
     }
   };
-
-  const handleBack = () => navigate(-1);
-
-  /* =========================
-     FORM CONFIG
-  ========================= */
-  const formFields = [
-    { type: "dropdown", name: "location", label: "Location", options: locations },
-    { type: "dropdown", name: "campus", label: "Campus", options: campuses },
-    { type: "dropdown", name: "department", label: "Department", options: departments },
-    {
-      type: "dropdown",
-      name: "position",
-      label: "Position / Designation",
-      options: positions,
-      disabled: !formData.department
-    },
-    { type: "dropdown", name: "manager", label: "Manager", options: employees },
-    {
-      type: "dropdown",
-      name: "reportingManager",
-      label: "Reporting Manager",
-      options: employees
-    },
-    {
-      type: "input",
-      name: "workingStartDate",
-      label: "Working Start Date",
-      inputType: "date"
-    }
-  ];
 
   /* =========================
      RENDER
@@ -277,57 +223,91 @@ const AssignGroupForm = () => {
     <div className={styles.assignGroupFormSection}>
       <h3 className={styles.assignGroupTitle}>Re-Mapping</h3>
 
+      {error && <p className={styles.errorText}>{error}</p>}
+
       <form className={styles.assignGroupForm} onSubmit={handleSubmit}>
         <div className={styles.formFieldsGrid}>
-          {formFields.map(field => (
-            <div key={field.name} className={styles.formGroup}>
-              {field.type === "dropdown" ? (
-                <Dropdown
-                  dropdownname={field.label}
-                  results={field.options.map(o => o.name)}
-                  name={field.name}
-                  value={formData[field.name]}
-                  onChange={handleInputChange}
-                  dropdownsearch
-                  disabled={field.disabled}
-                />
-              ) : (
-                <Inputbox
-                  label={field.label}
-                  name={field.name}
-                  type={field.inputType}
-                  value={formData[field.name]}
-                  onChange={handleInputChange}
-                />
-              )}
-            </div>
-          ))}
+          <Dropdown
+            dropdownname="Location"
+            results={locations.map(l => l.name)}
+            value={formData.location}
+            disabled
+          />
+
+          <Dropdown
+            dropdownname="Campus"
+            results={campuses.map(c => c.name)}
+            value={formData.campus}
+            disabled
+          />
+
+          <Dropdown
+            dropdownname="Department"
+            results={departments.map(d => d.name)}
+            name="department"
+            value={formData.department}
+            onChange={handleInputChange}
+            dropdownsearch
+            disabled={!!error}
+          />
+
+          <Dropdown
+            dropdownname="Position / Designation"
+            results={positions.map(p => p.name)}
+            name="position"
+            value={formData.position}
+            onChange={handleInputChange}
+            disabled={!formData.department || !!error}
+          />
+
+          <Dropdown
+            dropdownname="Manager"
+            results={employees.map(e => e.name)}
+            name="manager"
+            value={formData.manager}
+            onChange={handleInputChange}
+            dropdownsearch
+            disabled={!!error}
+          />
+
+          <Dropdown
+            dropdownname="Reporting Manager"
+            results={employees.map(e => e.name)}
+            name="reportingManager"
+            value={formData.reportingManager}
+            onChange={handleInputChange}
+            dropdownsearch
+            disabled={!!error}
+          />
+
+          <Inputbox
+            label="Working Start Date"
+            name="workingStartDate"
+            type="date"
+            value={formData.workingStartDate}
+            onChange={handleInputChange}
+            disabled={!!error}
+          />
         </div>
 
-        {/* SELECTED CAMPUSES */}
         <div className={styles.selectedCampusesSection}>
-          <label>Selected Campuses</label>
-
+          <label>Selected Campus</label>
           <div className={styles.selectedCampusesList}>
             {selectedCampuses.length === 0 ? (
               <div className={styles.emptyCampusState}>
                 <img src={iconSvg} alt="" />
-                <p>You haven't selected any campus yet</p>
+                <p>No campus selected</p>
               </div>
             ) : (
-              selectedCampuses.map(campus => (
-                <div key={campus.id} className={styles.campusChip}>
-                  <div>{campus.name}</div>
-                  <button type="button" onClick={() => handleRemoveCampus(campus.id)}>
-                    ×
-                  </button>
+              selectedCampuses.map(c => (
+                <div key={c.campusId} className={styles.campusChip}>
+                  {c.name}
                 </div>
               ))
             )}
           </div>
         </div>
 
-        {/* REMARKS */}
         <div className={styles.formGroup}>
           <label>Remarks</label>
           <textarea
@@ -335,17 +315,17 @@ const AssignGroupForm = () => {
             value={formData.remarks}
             onChange={handleInputChange}
             rows="4"
+            disabled={!!error}
           />
         </div>
 
-        {/* ACTIONS */}
         <div className={styles.formActions}>
           <Button
             buttonname="Back"
             type="button"
             variant="secondary"
             lefticon={leftarrow}
-            onClick={handleBack}
+            onClick={() => navigate(-1)}
             width="140px"
           />
 
@@ -355,6 +335,7 @@ const AssignGroupForm = () => {
             variant="primary"
             righticon={rightArrowIcon}
             width="160px"
+            disabled={!!error}
           />
         </div>
       </form>

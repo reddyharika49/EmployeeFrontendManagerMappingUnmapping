@@ -114,7 +114,7 @@ const UnassignGroupForm = () => {
     if (error) return;
 
     const payload = {
-      payrollIds,                       // BULK
+      payrollId: payrollIds,                     // BULK
       cityId: ids.cityId,
       campusIds: [ids.campusId],        // ARRAY REQUIRED
       managerId: ids.managerId,

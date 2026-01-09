@@ -19,54 +19,10 @@ const EmployeeCard = ({
   const data = employee || { id, name, dept, image, styleImg, level, status };
 
   const handleCardClick = (e) => {
-    // Prevent click from bubbling when checkbox is clicked directly
     if (e.target.closest(`.${styles.checkboxOverlay}`)) return;
-    
     onSelect && onSelect(data, !isSelected);
   };
-
-  const UncheckedCircleIcon = (
-    <svg width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <g filter="url(#filter0_i_910_2651)">
-        <circle cx="9" cy="9" r="9" fill="#E4E4E4" />
-      </g>
-      <circle cx="9" cy="9" r="8.75" stroke="#848484" strokeWidth="0.5" />
-      <defs>
-        <filter id="filter0_i_910_2651" x="0" y="0" width="18" height="22" filterUnits="userSpaceOnUse" colorInterpolationFilters="sRGB">
-          <feFlood floodOpacity="0" result="BackgroundImageFix" />
-          <feBlend mode="normal" in="SourceGraphic" in2="BackgroundImageFix" result="shape" />
-          <feColorMatrix in="SourceAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0" result="hardAlpha" />
-          <feOffset dy="4" />
-          <feGaussianBlur stdDeviation="2" />
-          <feComposite in2="hardAlpha" operator="arithmetic" k2="-1" k3="1" />
-          <feColorMatrix type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.25 0" />
-          <feBlend mode="normal" in2="shape" result="effect1_innerShadow_910_2651" />
-        </filter>
-      </defs>
-    </svg>
-  );
-
-  const BlueTickIcon = (
-    <svg width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <g filter="url(#filter0_i_910_2613)">
-        <circle cx="9" cy="9" r="9" fill="#3425FF" />
-      </g>
-      <circle cx="9" cy="9" r="8.75" stroke="white" strokeWidth="0.5" />
-      <path d="M6.09657 9.72188L7.77546 11.2072C7.96136 11.3717 8.24492 11.3562 8.4118 11.1724L12.2008 7.00033" stroke="white" strokeWidth="1.36078" strokeLinecap="round" />
-      <defs>
-        <filter id="filter0_i_910_2613" x="0" y="0" width="18" height="22" filterUnits="userSpaceOnUse" colorInterpolationFilters="sRGB">
-          <feFlood floodOpacity="0" result="BackgroundImageFix" />
-          <feBlend mode="normal" in="SourceGraphic" in2="BackgroundImageFix" result="shape" />
-          <feColorMatrix in="SourceAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0" result="hardAlpha" />
-          <feOffset dy="4" />
-          <feGaussianBlur stdDeviation="2" />
-          <feComposite in2="hardAlpha" operator="arithmetic" k2="-1" k3="1" />
-          <feColorMatrix type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.25 0" />
-          <feBlend mode="normal" in2="shape" result="effect1_innerShadow_910_2613" />
-        </filter>
-      </defs>
-    </svg>
-  );
+  const UncheckedCircleIcon = ( <svg width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg"> <g filter="url(#filter0_i_910_2651)"> <circle cx="9" cy="9" r="9" fill="#E4E4E4" /> </g> <circle cx="9" cy="9" r="8.75" stroke="#848484" strokeWidth="0.5" /> <defs> <filter id="filter0_i_910_2651" x="0" y="0" width="18" height="22" filterUnits="userSpaceOnUse" colorInterpolationFilters="sRGB"> <feFlood floodOpacity="0" result="BackgroundImageFix" /> <feBlend mode="normal" in="SourceGraphic" in2="BackgroundImageFix" result="shape" /> <feColorMatrix in="SourceAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0" result="hardAlpha" /> <feOffset dy="4" /> <feGaussianBlur stdDeviation="2" /> <feComposite in2="hardAlpha" operator="arithmetic" k2="-1" k3="1" /> <feColorMatrix type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.25 0" /> <feBlend mode="normal" in2="shape" result="effect1_innerShadow_910_2651" /> </filter> </defs> </svg> ); const BlueTickIcon = ( <svg width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg"> <g filter="url(#filter0_i_910_2613)"> <circle cx="9" cy="9" r="9" fill="#3425FF" /> </g> <circle cx="9" cy="9" r="8.75" stroke="white" strokeWidth="0.5" /> <path d="M6.09657 9.72188L7.77546 11.2072C7.96136 11.3717 8.24492 11.3562 8.4118 11.1724L12.2008 7.00033" stroke="white" strokeWidth="1.36078" strokeLinecap="round" /> <defs> <filter id="filter0_i_910_2613" x="0" y="0" width="18" height="22" filterUnits="userSpaceOnUse" colorInterpolationFilters="sRGB"> <feFlood floodOpacity="0" result="BackgroundImageFix" /> <feBlend mode="normal" in="SourceGraphic" in2="BackgroundImageFix" result="shape" /> <feColorMatrix in="SourceAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0" result="hardAlpha" /> <feOffset dy="4" /> <feGaussianBlur stdDeviation="2" /> <feComposite in2="hardAlpha" operator="arithmetic" k2="-1" k3="1" /> <feColorMatrix type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.25 0" /> <feBlend mode="normal" in2="shape" result="effect1_innerShadow_910_2613" /> </filter> </defs> </svg> );
 
   const getStatusClass = (st) => {
     switch (st?.toLowerCase()) {
@@ -85,12 +41,12 @@ const EmployeeCard = ({
     <Card
       className={`${styles.studentCard} ${isSelected ? styles.selected : ""}`}
       sx={{ position: "relative" }}
-      onClick={handleCardClick} /* ← Makes whole card clickable */
+      onClick={handleCardClick}
     >
       <Checkbox
         checked={isSelected}
         onChange={(e) => {
-          e.stopPropagation(); // Prevent double toggle
+          e.stopPropagation();
           onSelect && onSelect(data, e.target.checked);
         }}
         icon={UncheckedCircleIcon}
@@ -114,10 +70,28 @@ const EmployeeCard = ({
         />
 
         <CardContent className={styles.studentCardContent}>
+          {/* INFO */}
           <div className={styles.studentInfo}>
-            <p className={styles.studentId}>{data.id}</p>
-            <p className={styles.studentName}>{data.name}</p>
-            <p className={styles.studentFather}>{data.dept}</p>
+            <p
+              className={`${styles.studentId} ${styles.ellipsis}`}
+              title={data.id}
+            >
+              {data.id}
+            </p>
+
+            <p
+              className={`${styles.studentName} ${styles.ellipsis}`}
+              title={data.name}
+            >
+              {data.name}
+            </p>
+
+            <p
+              className={`${styles.studentFather} ${styles.ellipsis}`}
+              title={data.dept}
+            >
+              {data.dept}
+            </p>
           </div>
 
           {data.styleImg && (
@@ -130,12 +104,19 @@ const EmployeeCard = ({
             </figure>
           )}
 
+          {/* CHIPS */}
           <div className={styles.studentChipContainer}>
-            <span className={styles.studentCurrentClassBlue}>
+            <span
+              className={`${styles.studentCurrentClassBlue} ${styles.ellipsis}`}
+              title={data.level}
+            >
               {data.level}
             </span>
 
-            <span className={getStatusClass(data.status)}>
+            <span
+              className={`${getStatusClass(data.status)} ${styles.ellipsis}`}
+              title={data.status}
+            >
               {data.status}
             </span>
           </div>

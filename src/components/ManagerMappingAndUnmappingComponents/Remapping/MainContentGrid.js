@@ -149,6 +149,7 @@ import { fetchBatchCampusAddresses } from "api/managerMapping/managerMapping";
  
 /* 🔁 Merge selected card + API data */
 const convertEmployeeToGridFormat = (emp, apiData = {}) => {
+  console.log("MAPPING EMP:", emp.payRollId, apiData.campusId || emp.campusId);
   return {
     id: emp.payRollId || emp.payrollId,
  
@@ -160,15 +161,18 @@ const convertEmployeeToGridFormat = (emp, apiData = {}) => {
     phoneNumber: apiData.employeeMobileNo || null,
     email: emp.email || null,
     city:apiData.city || null,
+    cityId:apiData.cityId ||null,
  
     campus: {
-      campusId: apiData.campusId || null,         
+      id: apiData.campusId || emp.campusId,        
       name: emp.campusName || "—",
       address: apiData.fullAddress || "—"
     },
  
     reportingManager: apiData.reportingManagerName || "—",
+    managerId:apiData.managerId ||null,
     manager: apiData.managerName || "—",
+    reportingManagerId:apiData.reportingManagerId ||null,
  
     project: emp.projectName || "—"
   };

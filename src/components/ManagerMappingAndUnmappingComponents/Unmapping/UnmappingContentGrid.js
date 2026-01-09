@@ -25,8 +25,9 @@ const convertEmployeeToGridFormat = (emp, apiData = {}) => {
     city: apiData.city || null,
     cityId:apiData.cityId ||null,
     email: emp.email || null,
-
+   
     campus: {
+      id: apiData.campusId || emp.campusId,
       name: emp.campusName || "—",
       address: apiData.fullAddress || "—"
     },

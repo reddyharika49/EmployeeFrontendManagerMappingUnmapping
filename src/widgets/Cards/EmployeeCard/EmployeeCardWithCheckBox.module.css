@@ -5,17 +5,30 @@
   padding: 12px 26px;
   box-shadow: none !important;
   background: #FFFFFF;
-  transition: border-color 0.2s;
+  transition: border-color 0.2s, background-color 0.2s;
 }
 
 .studentCard:hover {
   border-color: #3425FF;
 }
 
-/* .studentCard.selected {
+/* Optional selected state */
+/*
+.studentCard.selected {
   border-color: #3425FF;
   background: #F0F4FF;
-} */
+}
+*/
+
+/* -------------------------
+   CARD STRUCTURE
+-------------------------- */
+.studentCardContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 7px;
+}
 
 .studentCardContent {
   padding: 0 !important;
@@ -24,31 +37,27 @@
   align-items: center;
   text-align: center;
   gap: 10px;
+  width: 100%; /* 🔥 required for ellipsis */
 }
 
-.studentCardContainer {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 7px;
-}
-
-figure {
-  margin: 0;
-  padding: 0;
-}
-
+/* -------------------------
+   AVATAR
+-------------------------- */
 .studentAvatar {
   width: 106px !important;
   height: 106px !important;
   border-radius: 180px !important;
 }
 
+/* -------------------------
+   INFO SECTION
+-------------------------- */
 .studentInfo {
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 3px;
+  width: 100%; /* 🔥 required */
 }
 
 .studentId {
@@ -56,6 +65,7 @@ figure {
   font-size: 14px;
   font-weight: 400;
   margin: 0;
+  max-width: 100%;
 }
 
 .studentName {
@@ -63,12 +73,33 @@ figure {
   font-weight: 700;
   font-size: 18px;
   margin: 0;
+  max-width: 100%;
 }
 
 .studentFather {
   color: #323232;
   font-size: 14px;
   margin: 0;
+  max-width: 100%;
+}
+
+/* -------------------------
+   GLOBAL TEXT ELLIPSIS
+-------------------------- */
+.ellipsis {
+  max-width: 100%;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  min-width: 0; /* 🔥 critical for flex layouts */
+}
+
+/* -------------------------
+   DECORATIVE IMAGE
+-------------------------- */
+figure {
+  margin: 0;
+  padding: 0;
 }
 
 .studentImageStyle {
@@ -77,17 +108,19 @@ figure {
   display: block;
 }
 
+/* -------------------------
+   CHIPS
+-------------------------- */
 .studentChipContainer {
   display: flex;
   justify-content: center;
-  padding: 2px 6px !important;
   align-items: center;
-  align-self: stretch;
-  gap: 10px;
+  gap: 6px;
+  padding: 2px 6px !important;
 }
 
+/* Level chip */
 .studentCurrentClassBlue {
-  white-space: nowrap;
   font-size: 12px;
   font-weight: 500;
   color: #3425FF;
@@ -95,10 +128,17 @@ figure {
   background-color: #C7C3FF;
   padding: 2px 6px;
   border-radius: 4px;
+
+  white-space: nowrap;
+  max-width: 70px; /* 🔥 truncate long backend values */
+  overflow: hidden;
+  text-overflow: ellipsis;
+  text-align: center;
 }
 
-/* ⭐ Dynamic Status Colors */
-
+/* -------------------------
+   STATUS CHIPS
+-------------------------- */
 .statusFullTime {
   font-size: 12px;
   font-weight: 500;
@@ -107,7 +147,12 @@ figure {
   background-color: #C0FAB3;
   padding: 2px 6px;
   border-radius: 4px;
+
   white-space: nowrap;
+  max-width: 70px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  text-align: center;
 }
 
 .statusContract {
@@ -118,32 +163,49 @@ figure {
   background-color: #FAE7B3;
   padding: 2px 6px;
   border-radius: 4px;
+
   white-space: nowrap;
+  max-width: 70px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  text-align: center;
 }
 
 .statusLeft {
   font-size: 12px;
-  font-weight: 500;
+  font-weight: 600;
   color: #8D1111;
   border: 1px solid #8D1111;
   background-color: #FAB3B3;
   padding: 2px 6px;
   border-radius: 4px;
+
   white-space: nowrap;
+  max-width: 70px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  text-align: center;
 }
 
 .statusDefault {
   font-size: 12px;
-  font-weight: 500;
-  color: #555;
-  border: 1px solid #ccc;
-  background-color: #eee;
+  font-weight: 600;
+  color: #118D19;
+  border: 1px solid #118D19;
+  background-color: #C0FAB3;
   padding: 2px 6px;
   border-radius: 4px;
+
   white-space: nowrap;
+  max-width: 70px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  text-align: center;
 }
 
-/* Checkbox */
+/* -------------------------
+   CHECKBOX OVERLAY
+-------------------------- */
 .checkboxOverlay {
   position: absolute !important;
   top: 8px !important;

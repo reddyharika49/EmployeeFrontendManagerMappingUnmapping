@@ -41,27 +41,48 @@ const UnmappingForm = ({ employee }) => {
       [name]: value
     }));
   };
-
+  console.log("Employee object:", employee);
+  console.log("Campus:", employee.campus);
+  console.log("Campus ID:", employee.campus?.id);
+  console.log({
+    payrollId: employee.id,
+    cityId: employee.cityId,
+    campusId: employee.campus?.id,
+    managerId: employee.managerId
+  });
+  
+  
   const handleSubmit = async (e) => {
     e.preventDefault();
   
-    if (!employee.campusId) {
+    // ✅ Check using nested campus object
+    if (!employee.campus?.id) {
       alert("Campus mapping not found. Please reselect employee.");
       return;
     }
+    
   
     const payload = {
-      payrollId: employee.id,
-      cityId: employee.cityId,
-      campusIds: [employee.campusId], // ✅ guaranteed non-null
-      managerId: employee.managerId,
-      reportingManagerId: employee.reportingManagerId,
+      payrollId: employee.id,               // string
+      cityId: employee.cityId,             // number
+      campusIds: [employee.campus.id],     // array of numbers
+      managerId: employee.managerId || 0,  // default 0 if missing
+      reportingManagerId: employee.reportingManagerId || 0, // default 0
       lastDate: new Date(formData.lastDate).toISOString(),
       remark: formData.remark,
       updatedBy: 1
     };
   
-    await unmapEmployee(payload);
+    try {
+      setLoading(true);
+      await unmapEmployee(payload);
+      alert("Employee unmapped successfully!");
+    } catch (err) {
+      console.error(err);
+      alert("Failed to unmap employee.");
+    } finally {
+      setLoading(false);
+    }
   };
   
 

@@ -108,13 +108,23 @@ export const getCampusesByLocation = async (locationId) => {
     );
     return res.data;
   };
-  export const getEmployeesByDepartmentAndCampus = async (departmentId,campusId) => {
-    if (!departmentId) return [];
+
+
+  // export const getEmployeesByDepartmentAndCampus = async (departmentId,campusId) => {
+  //   if (!departmentId) return [];
+  //   const res = await axios.get(
+  //     `http://localhost:8080/api/campus-flow/getemployees/${departmentId}/${campusId}`
+  //   );
+  //   return res.data;
+  // };
+  export const getEmployeesByCampus = async (campusId) => {
+    if (!campusId) return [];
     const res = await axios.get(
-      `http://localhost:8080/api/campus-flow/getemployees/${departmentId}/${campusId}`
+      `http://localhost:8080/api/employeeModule/employees/campus/${campusId}`
     );
     return res.data;
   };
+
 
 
   //Search employees
