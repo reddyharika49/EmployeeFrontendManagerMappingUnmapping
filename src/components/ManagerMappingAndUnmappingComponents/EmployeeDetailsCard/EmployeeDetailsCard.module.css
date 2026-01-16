@@ -368,3 +368,33 @@
   justify-content: center;
 }
 
+
+.unmappedSuccessContainer {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 60px 20px;
+    background: #FFFFFF;
+    /* border: 1px dashed #3425FF; */
+    /* border-radius: 8px; */
+    margin: 10px 0;
+}
+
+.successIcon {
+    width: 48px;
+    height: 48px;
+    margin-bottom: 12px;
+}
+
+.successText {
+    color: #3425FF;
+    font-weight: 600;
+    font-size: 16px;
+}
+
+.remapButtonContainer {
+    margin-top: 15px;
+    display: flex;
+    justify-content: center;
+}

@@ -141,6 +141,12 @@
   justify-content: center;
   margin-top: 8px;
 }
+.remapButtonWrapper{
+    display: flex;
+  justify-content: center;
+  margin-top: 560px;
+}
+
 
 /* .confirmButton {
   background: #3425FF;
