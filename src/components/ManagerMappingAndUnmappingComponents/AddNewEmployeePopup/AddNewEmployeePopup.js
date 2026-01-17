@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import styles from './AddNewEmployeePopup.module.css';
-import EmployeeCard from 'widgets/ManagerMappingAndUnmappingWidgets/EmployeeCard/EmployeeCard';
+import EmployeeCard from 'widgets/Cards/EmployeeCard/EmployeeCardWithCheckBox';
 import Button from 'widgets/Button/Button';
 import profilePhoto from 'assets/ManagerMappingAndUnmappingAssets/profilePhoto.svg';
 import rightArrowIcon from 'assets/managermappingsearch/rightarrow.jsx';

@@ -119,7 +119,14 @@ useEffect(() => {
     });
   };
         
-  
+  const breadcrumbItems = [];
+
+// if (filters?.state?.name) breadcrumbItems.push(filters.state.name);
+if (filters?.city?.cityName) breadcrumbItems.push(filters.city.cityName);
+if (filters?.campus?.campusName) breadcrumbItems.push(filters.campus.campusName);
+// if (filters?.empType?.name) breadcrumbItems.push(filters.empType.name);
+if (filters?.department?.name) breadcrumbItems.push(filters.department.name);
+
 
   return (
     <div className={styles.search_wrapper}>
@@ -136,13 +143,29 @@ useEffect(() => {
       </div>
 
       {/* Breadcrumb */}
-      <div className={styles.breadcrumb}>
+      {/* <div className={styles.breadcrumb}>
         <span>Hyderabad</span>
         <img src={breadcrumarrow} className={styles.bcIcon} alt="" />
         <span>BanjaraHills</span>
         <img src={breadcrumarrow} className={styles.bcIcon} alt="" />
         <span>Teaching</span>
-      </div>
+      </div> */}
+{breadcrumbItems.length > 0 && (
+  <div className={styles.breadcrumb}>
+    {breadcrumbItems.map((item, index) => (
+      <React.Fragment key={index}>
+        <span>{item}</span>
+        {index < breadcrumbItems.length - 1 && (
+          <img
+            src={breadcrumarrow}
+            className={styles.bcIcon}
+            alt=">"
+          />
+        )}
+      </React.Fragment>
+    ))}
+  </div>
+)}
 
       {/* Card List */}
       <div className={styles.cardRow}>

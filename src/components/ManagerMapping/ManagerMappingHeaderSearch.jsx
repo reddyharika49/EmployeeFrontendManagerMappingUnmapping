@@ -27,11 +27,42 @@ const EmployeeModuleHeaderSearch = () => {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
+  const handleKeyDown = (e) => {
+    if (e.key === "Enter") {
+      navigate("/scopes/employee/employeeManager/search-results", {
+        state: {
+          filters: null,
+          payrollId: searchText?.trim() || null,
+          searchMode: "PAYROLL"
+        }
+      });
+      setIsFilterOpen(false);
+    }
+  };
   
 
   return (
-    <div ref={searchRef} className={styles.searchContainerWithDropdown}>
-
+    <div
+      ref={searchRef}
+      className={styles.searchContainerWithDropdown}
+      onKeyDown={(e) => {
+        if (e.key === "Enter") {
+          e.preventDefault();
+  
+          if (!searchText?.trim()) return;
+  
+          navigate("/scopes/employee/employeeManager/search-results", {
+            state: {
+              filters: null,
+              payrollId: searchText.trim(),
+              searchMode: "PAYROLL",
+            },
+          });
+  
+          setIsFilterOpen(false);
+        }
+      }}
+    >
       <ApplicationSearchBar
         placeholderText="Search for Employee Name / Payroll ID"
         value={searchText}
@@ -39,33 +70,33 @@ const EmployeeModuleHeaderSearch = () => {
         onClick={handleSearchIconClick}
         customClass={styles.search_bar_zindex}
       />
-
+  
       <FilterDropdown
         isOpen={isFilterOpen}
         onApplyFilters={(filters) => {
           setIsFilterOpen(false);
-        
+  
           const hasFilters = Object.values(filters || {}).some(v => v);
-        
+  
           navigate("/scopes/employee/employeeManager/search-results", {
             state: {
               filters,
               payrollId: searchText?.trim() || null,
-              searchMode: hasFilters ? "FILTER" : "PAYROLL"
-            }
+              searchMode: hasFilters ? "FILTER" : "PAYROLL",
+            },
           });
         }}
-        
       />
-
+  
       {isFilterOpen && (
         <div
           className={styles.backdrop_overlay}
           onClick={() => setIsFilterOpen(false)}
-        ></div>
+        />
       )}
     </div>
   );
-};
+}
+
 
 export default EmployeeModuleHeaderSearch;
