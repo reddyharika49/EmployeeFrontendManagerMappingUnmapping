@@ -12,10 +12,10 @@ import {
   getDepartments,
   getDesignationsByDepartment,
   getEmployeesByCampus,
-  mapEmployee
+  mapEmployeeGroup
 } from "api/managerMapping/managerMapping";
 
-const RemappingForm = ({ employee }) => {
+const RemappingForm = ({ employee, onSuccess }) => {
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [remappedData, setRemappedData] = useState(null);
 
@@ -23,7 +23,7 @@ const RemappingForm = ({ employee }) => {
      FORM STATE
   ========================= */
   const [formData, setFormData] = useState({
-    location: "",
+    city: "",
     campus: "",
     department: "",
     designation: "",
@@ -41,14 +41,14 @@ const RemappingForm = ({ employee }) => {
   const [employees, setEmployees] = useState([]);
 
   /* =========================
-     AUTO POPULATE FROM PAYLOAD
+     AUTO POPULATE
   ========================= */
   useEffect(() => {
     if (!employee) return;
 
     setFormData(prev => ({
       ...prev,
-      location: employee.city || "",
+      city: employee.city || "",
       campus: employee.campus?.name || "",
       department: employee.department || "",
       designation: employee.designation || "",
@@ -59,11 +59,10 @@ const RemappingForm = ({ employee }) => {
     if (employee.campus?.id) {
       loadEmployees(employee.campus.id);
     }
-    
   }, [employee]);
 
   /* =========================
-     INITIAL LOAD
+     LOAD DEPARTMENTS
   ========================= */
   useEffect(() => {
     loadDepartments();
@@ -71,11 +70,13 @@ const RemappingForm = ({ employee }) => {
 
   const loadDepartments = async () => {
     const res = await getDepartments();
-    setDepartments((res || []).map(d => ({ label: d.name, value: d.id })));
+    setDepartments(
+      (res || []).map(d => ({ label: d.name, value: d.id }))
+    );
   };
 
   /* =========================
-     DESIGNATION BY DEPARTMENT
+     DESIGNATIONS BY DEPT
   ========================= */
   useEffect(() => {
     const dept = departments.find(d => d.label === formData.department);
@@ -85,37 +86,32 @@ const RemappingForm = ({ employee }) => {
 
   const loadDesignations = async (departmentId) => {
     const res = await getDesignationsByDepartment(departmentId);
-    setDesignations((res || []).map(d => ({ label: d.name, value: d.id })));
+    setDesignations(
+      (res || []).map(d => ({ label: d.name, value: d.id }))
+    );
   };
 
   /* =========================
-     FETCH EMPLOYEES BY CAMPUS ✅
+     EMPLOYEES BY CAMPUS
   ========================= */
   const loadEmployees = async (campusId) => {
-    if (!campusId) return;
-
     const res = await getEmployeesByCampus(campusId);
-
     setEmployees(
       (res || []).map(emp => ({
         label: emp.name,
-        value: {
-          id: emp.id,
-          name: emp.name
-        }
+        value: { id: emp.id, name: emp.name }
       }))
     );
   };
 
   /* =========================
-     HANDLE INPUT
+     INPUT HANDLER
   ========================= */
   const handleInputChange = (e) => {
     if (e?.name) {
       setFormData(prev => ({ ...prev, [e.name]: e.value }));
       return;
     }
-
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
   };
@@ -128,10 +124,10 @@ const RemappingForm = ({ employee }) => {
 
     const payload = {
       cityId: employee.cityId,
+
       campusMappings: [
         {
           campusId: employee.campus.id,
-
           departmentId:
             departments.find(d => d.label === formData.department)?.value || 0,
           designationId:
@@ -139,23 +135,37 @@ const RemappingForm = ({ employee }) => {
           subjectId: 0
         }
       ],
-      payrollId: String(employee.id),
-      managerId: formData.manager?.id || 0,
-      reportingManagerId: formData.reportingManager?.id || 0,
+
+      payrollIds: [String(employee.id)],
+
+      managerId:
+        employees.find(e => e.label === formData.manager)?.value?.id || 0,
+
+      reportingManagerId:
+        employees.find(e => e.label === formData.reportingManager)?.value?.id || 0,
+
       workStartingDate: formData.workingStartDate
         ? new Date(formData.workingStartDate).toISOString()
         : null,
+
       remark: formData.remarks || "",
-      updatedBy: 0
+      updatedBy: 5215
     };
 
+    console.log("Remap Payload:", payload);
+
     try {
-      await mapEmployee(payload);
-      setRemappedData({ ...employee, ...payload });
+      await mapEmployeeGroup(payload);
+      setRemappedData({
+        ...employee,
+        manager: formData.manager,
+        reportingManager: formData.reportingManager
+      });
       setIsSubmitted(true);
+      onSuccess?.();
     } catch (err) {
-      console.error("Mapping failed", err);
-      alert("Failed to map employee");
+      console.error("Remapping failed", err);
+      alert("Failed to remap employee");
     }
   };
 
@@ -169,10 +179,11 @@ const RemappingForm = ({ employee }) => {
           <h3 className={styles.remappingTitle}>Re-Mapping</h3>
 
           <form className={styles.remappingForm} onSubmit={handleSubmit}>
+            {/* ✅ CITY (formerly Location) */}
             <Dropdown
-              dropdownname="Location"
-              results={[formData.location]}
-              value={formData.location}
+              dropdownname="City"
+              results={[formData.city]}
+              value={formData.city}
               disabled
             />
 
@@ -249,7 +260,9 @@ const RemappingForm = ({ employee }) => {
           </form>
         </>
       ) : (
-        remappedData && <EmployeeDetailsCard employee={remappedData} hideHeader />
+        remappedData && (
+          <EmployeeDetailsCard employee={remappedData} hideHeader />
+        )
       )}
     </div>
   );

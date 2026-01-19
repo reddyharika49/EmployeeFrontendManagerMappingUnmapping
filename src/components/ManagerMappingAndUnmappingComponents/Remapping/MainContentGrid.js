@@ -136,6 +136,158 @@
 // };
 
 // export default MainContentGrid;
+// import React, { useState, useEffect } from 'react';
+// import styles from './MainContentGrid.module.css';
+// import EmployeeDetailsCard from '../EmployeeDetailsCard/EmployeeDetailsCard';
+// import AddEmployeeWidget from 'widgets/ManagerMappingAndUnmappingWidgets/AddNewEmployee(Blank)/AddEmployeeWidget';
+// import RemappingForm from './RemappingForm';
+// import AddNewEmployeePopup from '../AddNewEmployeePopup/AddNewEmployeePopup';
+// import backarrow from 'assets/managermappingsearch/topleftarrow.svg';
+// import { useNavigate, useLocation } from "react-router-dom";
+ 
+// import { fetchBatchCampusAddresses } from "api/managerMapping/managerMapping";
+ 
+// /* 🔁 Merge selected card + API data */
+// const convertEmployeeToGridFormat = (emp, apiData = {}) => {
+//   console.log("MAPPING EMP:", emp.payRollId, apiData.campusId || emp.campusId);
+//   return {
+//     id: emp.payRollId || emp.payrollId,
+ 
+//     name: emp.empName || "—",
+//     department: emp.departmentName || "—",
+//     level: emp.employeeTypeName || "—",
+//     type: emp.modeOfHiringName || "—",
+ 
+//     phoneNumber: apiData.employeeMobileNo || null,
+//     email: emp.email || null,
+//     city:apiData.city || null,
+//     cityId:apiData.cityId ||null,
+ 
+//     campus: {
+//       id: apiData.campusId || emp.campusId,        
+//       name: emp.campusName || "—",
+//       address: apiData.fullAddress || "—"
+//     },
+ 
+//     reportingManager: apiData.reportingManagerName || "—",
+//     managerId:apiData.managerId ||null,
+//     manager: apiData.managerName || "—",
+//     reportingManagerId:apiData.reportingManagerId ||null,
+ 
+//     project: emp.projectName || "—"
+//   };
+// };
+ 
+// const MainContentGrid = () => {
+//   const navigate = useNavigate();
+//   const location = useLocation();
+//   const goBack = () => navigate(-1);
+ 
+//   const selectedEmployees = location.state?.selectedEmployees || [];
+ 
+//   const [employees, setEmployees] = useState([]);
+//   const [isAddEmployeePopupOpen, setIsAddEmployeePopupOpen] = useState(false);
+ 
+//   useEffect(() => {
+//     if (selectedEmployees.length === 0) return;
+ 
+//     const payrollIds = selectedEmployees.map(emp => emp.payRollId);
+ 
+//     fetchBatchCampusAddresses(payrollIds)
+//       .then(res => {
+//         const apiResponse = res.data || [];
+ 
+//         // Create lookup map
+//         const apiMap = {};
+//         apiResponse.forEach(item => {
+//           apiMap[item.payrollId] = item;
+//         });
+ 
+//         const mergedEmployees = selectedEmployees.map(emp => {
+//           const apiData = apiMap[emp.payRollId] || {};
+//           return convertEmployeeToGridFormat(emp, apiData);
+//         });
+ 
+//         setEmployees(mergedEmployees);
+//       })
+//       .catch(err => {
+//         console.error("Failed to fetch campus details", err);
+ 
+//         // fallback: show selected data only
+//         const fallback = selectedEmployees.map(emp =>
+//           convertEmployeeToGridFormat(emp)
+//         );
+//         setEmployees(fallback);
+//       });
+ 
+//   }, [selectedEmployees]);
+ 
+//   const handleAddEmployeeClick = () => {
+//     setIsAddEmployeePopupOpen(true);
+//   };
+ 
+//   const handleAddEmployees = (newSelectedEmployees) => {
+//     const payrollIds = newSelectedEmployees.map(emp => emp.payRollId);
+ 
+//     fetchBatchCampusAddresses(payrollIds).then(res => {
+//       const apiMap = {};
+//       res.data.forEach(item => {
+//         apiMap[item.payrollId] = item;
+//       });
+ 
+//       const formatted = newSelectedEmployees.map(emp =>
+//         convertEmployeeToGridFormat(emp, apiMap[emp.payRollId])
+//       );
+ 
+//       setEmployees(prev => [...prev, ...formatted]);
+//     });
+//   };
+ 
+//   return (
+//     <>
+//       <div className={styles.mainContentGrid}>
+//         <div>
+//           <div className={styles.topRow}>
+//             <img
+//               src={backarrow}
+//               alt="back"
+//               className={styles.backIcon}
+//               onClick={goBack}
+//             />
+//             <div className={styles.modeheader}>
+//               <h2 className={styles.title}>Assign Employee To Campus</h2>
+//               <p className={styles.subtitle}>
+//                 Assign Campus to each of employees
+//               </p>
+//             </div>
+//           </div>
+//         </div>
+ 
+//         <div className={styles.employeeGrid}>
+//           {employees.map((employee, index) => (
+//             <div key={index} className={styles.gridColumn}>
+//               <EmployeeDetailsCard employee={employee} />
+//               <RemappingForm employee={employee} />
+//             </div>
+//           ))}
+ 
+//           <div className={styles.gridColumn}>
+//             <AddEmployeeWidget onClick={handleAddEmployeeClick} />
+//           </div>
+//         </div>
+ 
+//         <AddNewEmployeePopup
+//           isOpen={isAddEmployeePopupOpen}
+//           onClose={() => setIsAddEmployeePopupOpen(false)}
+//           onAddEmployees={handleAddEmployees}
+//         />
+//       </div>
+//     </>
+//   );
+// };
+ 
+// export default MainContentGrid;
+ 
 import React, { useState, useEffect } from 'react';
 import styles from './MainContentGrid.module.css';
 import EmployeeDetailsCard from '../EmployeeDetailsCard/EmployeeDetailsCard';
@@ -147,33 +299,27 @@ import { useNavigate, useLocation } from "react-router-dom";
  
 import { fetchBatchCampusAddresses } from "api/managerMapping/managerMapping";
  
-/* 🔁 Merge selected card + API data */
+/* 🔁 Helper: Merges selected card data with API data */
 const convertEmployeeToGridFormat = (emp, apiData = {}) => {
-  console.log("MAPPING EMP:", emp.payRollId, apiData.campusId || emp.campusId);
   return {
     id: emp.payRollId || emp.payrollId,
- 
     name: emp.empName || "—",
     department: emp.departmentName || "—",
     level: emp.employeeTypeName || "—",
     type: emp.modeOfHiringName || "—",
- 
     phoneNumber: apiData.employeeMobileNo || null,
     email: emp.email || null,
-    city:apiData.city || null,
-    cityId:apiData.cityId ||null,
- 
+    city: apiData.city || null,
+    cityId: apiData.cityId || null,
     campus: {
       id: apiData.campusId || emp.campusId,        
       name: emp.campusName || "—",
       address: apiData.fullAddress || "—"
     },
- 
     reportingManager: apiData.reportingManagerName || "—",
-    managerId:apiData.managerId ||null,
+    managerId: apiData.managerId || null,
     manager: apiData.managerName || "—",
-    reportingManagerId:apiData.reportingManagerId ||null,
- 
+    reportingManagerId: apiData.reportingManagerId || null,
     project: emp.projectName || "—"
   };
 };
@@ -188,59 +334,58 @@ const MainContentGrid = () => {
   const [employees, setEmployees] = useState([]);
   const [isAddEmployeePopupOpen, setIsAddEmployeePopupOpen] = useState(false);
  
+  /* 🔹 Initial Load from Navigation State */
   useEffect(() => {
     if (selectedEmployees.length === 0) return;
- 
-    const payrollIds = selectedEmployees.map(emp => emp.payRollId);
- 
+    fetchAndSetEmployees(selectedEmployees);
+  }, [selectedEmployees]);
+
+  /* 🔹 reusable function to fetch API details and update state */
+  const fetchAndSetEmployees = (employeeList, isNewBatch = false) => {
+    const payrollIds = employeeList.map(emp => emp.payRollId || emp.id);
+
     fetchBatchCampusAddresses(payrollIds)
       .then(res => {
         const apiResponse = res.data || [];
- 
-        // Create lookup map
         const apiMap = {};
         apiResponse.forEach(item => {
           apiMap[item.payrollId] = item;
         });
- 
-        const mergedEmployees = selectedEmployees.map(emp => {
-          const apiData = apiMap[emp.payRollId] || {};
-          return convertEmployeeToGridFormat(emp, apiData);
+
+        const formatted = employeeList.map(emp => {
+          // Normalize structure so 'convert' helper works for both initial and popup data
+          const normalized = {
+            payRollId: emp.payRollId || emp.id,
+            empName: emp.empName || emp.name,
+            departmentName: emp.departmentName || emp.dept,
+            employeeTypeName: emp.employeeTypeName || emp.level,
+            modeOfHiringName: emp.modeOfHiringName || emp.status,
+            campusId: emp.campusId,
+            campusName: emp.campusName,
+            email: emp.email,
+            projectName: emp.projectName
+          };
+          return convertEmployeeToGridFormat(normalized, apiMap[normalized.payRollId] || {});
         });
- 
-        setEmployees(mergedEmployees);
+
+        setEmployees(prev => {
+          if (!isNewBatch) return formatted;
+          const existingIds = new Set(prev.map(e => e.id));
+          const filteredNewOnes = formatted.filter(e => !existingIds.has(e.id));
+          return [...prev, ...filteredNewOnes];
+        });
       })
-      .catch(err => {
-        console.error("Failed to fetch campus details", err);
- 
-        // fallback: show selected data only
-        const fallback = selectedEmployees.map(emp =>
-          convertEmployeeToGridFormat(emp)
-        );
-        setEmployees(fallback);
-      });
- 
-  }, [selectedEmployees]);
+      .catch(err => console.error("Failed to fetch campus details", err));
+  };
  
   const handleAddEmployeeClick = () => {
     setIsAddEmployeePopupOpen(true);
   };
  
+  /* 🔹 Handle Adding Employees from Popup (Sync with Unmapping Logic) */
   const handleAddEmployees = (newSelectedEmployees) => {
-    const payrollIds = newSelectedEmployees.map(emp => emp.payRollId);
- 
-    fetchBatchCampusAddresses(payrollIds).then(res => {
-      const apiMap = {};
-      res.data.forEach(item => {
-        apiMap[item.payrollId] = item;
-      });
- 
-      const formatted = newSelectedEmployees.map(emp =>
-        convertEmployeeToGridFormat(emp, apiMap[emp.payRollId])
-      );
- 
-      setEmployees(prev => [...prev, ...formatted]);
-    });
+    // We pass true to indicate this is a new batch being appended
+    fetchAndSetEmployees(newSelectedEmployees, true);
   };
  
   return (
@@ -265,7 +410,7 @@ const MainContentGrid = () => {
  
         <div className={styles.employeeGrid}>
           {employees.map((employee, index) => (
-            <div key={index} className={styles.gridColumn}>
+            <div key={employee.id || index} className={styles.gridColumn}>
               <EmployeeDetailsCard employee={employee} />
               <RemappingForm employee={employee} />
             </div>
@@ -287,5 +432,3 @@ const MainContentGrid = () => {
 };
  
 export default MainContentGrid;
- 
- 

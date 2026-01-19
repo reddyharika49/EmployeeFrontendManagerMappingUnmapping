@@ -231,14 +231,14 @@ const AssignGroupForm = () => {
             dropdownname="Location"
             results={locations.map(l => l.name)}
             value={formData.location}
-            disabled
+            // disabled
           />
 
           <Dropdown
             dropdownname="Campus"
             results={campuses.map(c => c.name)}
             value={formData.campus}
-            disabled
+            // disabled
           />
 
           <Dropdown

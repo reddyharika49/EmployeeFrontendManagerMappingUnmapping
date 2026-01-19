@@ -174,7 +174,7 @@ const UnmappingForm = ({ employee, onSuccess, isUnmapped }) => {
 
   const [loading, setLoading] = useState(false);
   const [showRemap, setShowRemap] = useState(false);
-  
+
   // 🔹 Local state to override the parent's isUnmapped prop
   const [internalIsUnmapped, setInternalIsUnmapped] = useState(isUnmapped);
 
@@ -270,8 +270,8 @@ const UnmappingForm = ({ employee, onSuccess, isUnmapped }) => {
           key={employee?.id || "remap-card"} // 👈 THIS IS THE FIX
           employee={employee}
           hideHeader={true}
-          isUnmapped={false} 
-          hideSuccess={true} 
+          isUnmapped={false}
+          hideSuccess={true}
         />
         <RemappingForm employee={employee} />
       </div>

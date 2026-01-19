@@ -27,18 +27,18 @@ const EmployeeModuleHeaderSearch = () => {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  const handleKeyDown = (e) => {
-    if (e.key === "Enter") {
-      navigate("/scopes/employee/employeeManager/search-results", {
-        state: {
-          filters: null,
-          payrollId: searchText?.trim() || null,
-          searchMode: "PAYROLL"
-        }
-      });
-      setIsFilterOpen(false);
-    }
-  };
+  // const handleKeyDown = (e) => {
+  //   if (e.key === "Enter") {
+  //     navigate("/scopes/employee/employeeManager/search-results", {
+  //       state: {
+  //         filters: null,
+  //         payrollId: searchText?.trim() || null,
+  //         searchMode: "PAYROLL"
+  //       }
+  //     });
+  //     setIsFilterOpen(false);
+  //   }
+  // };
   
 
   return (

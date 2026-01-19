@@ -162,3 +162,5 @@ export const getCampusesByLocation = async (locationId) => {
         payload
       );
     };
+
+    

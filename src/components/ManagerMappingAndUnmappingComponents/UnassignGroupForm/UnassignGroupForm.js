@@ -114,14 +114,14 @@ const UnassignGroupForm = () => {
     if (error) return;
 
     const payload = {
-      payrollId: payrollIds,                     // BULK
       cityId: ids.cityId,
-      campusIds: [ids.campusId],        // ARRAY REQUIRED
+      campusIds: [ids.campusId],          // ARRAY ✅
+      payrollIds: payrollIds,             // ✅ BULK array
       managerId: ids.managerId,
       reportingManagerId: ids.reportingManagerId,
-      lastDate: new Date(formData.toDate).toISOString(),
+      lastDate: formData.toDate,          // ✅ yyyy-MM-dd
       remark: formData.remarks,
-      updatedBy: 1
+      updatedBy: ids.managerId || 1       // use manager ID or fallback
     };
 
     console.log("🚀 Unmap payload:", payload);
