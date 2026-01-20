@@ -1,17 +1,17 @@
 // // components/ManagerMapping/EmployeeSearchResults.js
-import React, { useEffect, useState } from "react";
-import { useNavigate, useLocation } from "react-router-dom";
-import EmployeeCard from 'widgets/Cards/EmployeeCard/EmployeeCardWithCheckBox';
-import styles from "./EmployeeSearchResults.module.css";
+// import React, { useEffect, useState } from "react";
+// import { useNavigate, useLocation } from "react-router-dom";
+// import EmployeeCard from 'widgets/Cards/EmployeeCard/EmployeeCardWithCheckBox';
+// import styles from "./EmployeeSearchResults.module.css";
 
-import empprofile from 'assets/managermappingsearch/empprofile.svg';
-import blueLine from 'assets/managermappingsearch/bluefilterline.svg';
-import breadcrumarrow from 'assets/managermappingsearch/breadcrumarrow.svg';
-import rightarrow from 'assets/managermappingsearch/rightarrow.jsx';
-import Button from 'widgets/Button/Button';
+// import empprofile from 'assets/managermappingsearch/empprofile.svg';
+// import blueLine from 'assets/managermappingsearch/bluefilterline.svg';
+// // import breadcrumarrow from 'assets/managermappingsearch/breadcrumarrow.svg';
+// import rightarrow from 'assets/managermappingsearch/rightarrow.jsx';
+// import Button from 'widgets/Button/Button';
 
 
-import { advancedEmployeeSearch } from "api/managerMapping/managerMapping";
+// import { advancedEmployeeSearch } from "api/managerMapping/managerMapping";
 
 // const EmployeeSearchResults = ({
 //   employees,
@@ -238,7 +238,21 @@ import { advancedEmployeeSearch } from "api/managerMapping/managerMapping";
  
  
 // import { advancedEmployeeSearch } from "../../../queries/Employee_queries/managerMapping/managerMapping.jsx";
- 
+ // components/ManagerMapping/EmployeeSearchResults.js
+import React, { useEffect, useState } from "react";
+import { useNavigate, useLocation } from "react-router-dom";
+import EmployeeCard from 'widgets/Cards/EmployeeCard/EmployeeCardWithCheckBox';
+import styles from "./EmployeeSearchResults.module.css";
+
+import empprofile from 'assets/managermappingsearch/empprofile.svg';
+import blueLine from 'assets/managermappingsearch/bluefilterline.svg';
+// import breadcrumarrow from 'assets/managermappingsearch/breadcrumarrow.svg';
+import rightarrow from 'assets/managermappingsearch/rightarrow.jsx';
+import Button from 'widgets/Button/Button';
+
+
+import { advancedEmployeeSearch } from "api/managerMapping/managerMapping";
+
 const EmployeeSearchResults = ({
   employees = [],
   setEmployees,
@@ -383,71 +397,67 @@ if (filters?.department?.name) breadcrumbItems.push(filters.department.name);
       <React.Fragment key={index}>
         <span>{item}</span>
         {index < breadcrumbItems.length - 1 && (
-          <img
-            src={breadcrumarrow}
-            className={styles.bcIcon}
-            alt=">"
-          />
+          "/"
         )}
       </React.Fragment>
     ))}
   </div>
 )}
  
-      {/* Card List */}
-      <div className={styles.cardRow}>
-        {employees.map((emp, idx) => (
-          <EmployeeCard
-            key={emp.empId}
-            id={emp.payRollId}
-            name={emp.empName}
-            dept={emp.departmentName}
-            level={emp.employeeTypeName}
-            status={emp.modeOfHiringName}
-            image={empprofile}
-            styleImg={blueLine}
-            isSelected={selectedEmployees.some(e => e.empId === emp.empId)}
-            onSelect={(employee, checked) =>
-              handleSelect(emp, checked)
+      {/* Scrollable Card List - Fixed height with overflow */}
+      <div className={styles.scrollableCardContainer}>
+        <div className={styles.cardRow}>
+          {employees.map((emp, idx) => (
+            <EmployeeCard
+              key={emp.empId}
+              id={emp.payRollId}
+              name={emp.empName}
+              dept={emp.departmentName}
+              level={emp.employeeTypeName}
+              status={emp.modeOfHiringName}
+              image={empprofile}
+              styleImg={blueLine}
+              isSelected={selectedEmployees.some(e => e.empId === emp.empId)}
+              onSelect={(employee, checked) =>
+                handleSelect(emp, checked)
+              }
+            />
+          ))}
+          {loading && <p>Loading employees...</p>}
+ 
+          {!loading && employees.length === 0 && (
+            <p>No employees found for selected criteria</p>
+          )}
+        </div>
+      </div>
+
+      {/* Fixed Footer with Backdrop Filter */}
+      <div className={styles.fixedFooter}>
+        <div className={styles.footerActions}>
+          <Button
+            buttonname="Cancel"
+            type="button"
+            variant="secondary"
+            width="108px"
+            onClick={() => setSelectedEmployees([])}
+          />
+ 
+          <Button
+            buttonname="Next"
+            type="button"
+            righticon={rightarrow}
+            variant="primary"
+            width="123px"
+            onClick={() =>
+              navigate("/scopes/employee/employeeManager/mapping-mode", {
+                state: { selectedEmployees }
+              })
             }
           />
-        ))}
-        {loading && <p>Loading employees...</p>}
- 
-        {!loading && employees.length === 0 && (
-          <p>No employees found for selected criteria</p>
-        )}
- 
+        </div>
       </div>
- 
- {/* Footer */}
-<div className={styles.footer}>
-  <div className={styles.footerActions}>
-    <Button
-      buttonname="Cancel"
-      type="button"
-      variant="secondary"
-      width="108px"
-      onClick={() => setSelectedEmployees([])}
-    />
- 
-    <Button
-      buttonname="Next"
-      type="button"
-      righticon={rightarrow}
-      variant="primary"
-      width="123px"
-      onClick={() =>
-        navigate("/scopes/employee/employeeManager/mapping-mode", {
-          state: { selectedEmployees }
-        })
-      }
-    />
-  </div>
-</div>
     </div>
   );
 };
  
 export default EmployeeSearchResults;
- 

@@ -164,7 +164,7 @@ const MappingMode = () => {
         <div className={styles.formContainer}>
           {showAssignSuccess ? (
             <ManagerMappingSuccess
-              successTitle="Re-Mapping Successful" // 👈 Pass title
+              successTitle="Manager Mapping Successful" // 👈 Pass title
               onBack={() => {
                 setShowAssignSuccess(false); // 👈 Reset state to show form again, or navigate(-1) if preferred
                 // navigate(-1); // Alternative: go back to mode selection
@@ -179,7 +179,7 @@ const MappingMode = () => {
         <div className={styles.formContainer}>
           {showUnassignSuccess ? (
             <ManagerMappingSuccess
-              successTitle="Un-Mapping Successful" // 👈 Pass title
+              successTitle=" Manager  Un-Mapping Successful" // 👈 Pass title
               onBack={() => {
                 setShowUnassignSuccess(false); // 👈 Reset state to show form again, or navigate(-1) if preferred
                 // navigate(-1); // Alternative: go back to mode selection

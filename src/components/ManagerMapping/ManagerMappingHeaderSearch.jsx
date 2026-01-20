@@ -60,6 +60,7 @@ const EmployeeModuleHeaderSearch = () => {
           });
   
           setIsFilterOpen(false);
+          setSearchText(""); // 👈 Clear search bar after search
         }
       }}
     >

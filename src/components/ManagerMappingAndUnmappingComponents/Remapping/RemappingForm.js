@@ -1,3 +1,274 @@
+// import React, { useState, useEffect } from "react";
+// import styles from "./RemappingForm.module.css";
+
+// import Dropdown from "widgets/Dropdown/Dropdown";
+// import Inputbox from "widgets/Inputbox/InputBox";
+// import Button from "widgets/Button/Button";
+
+// import EmployeeDetailsCard from "../EmployeeDetailsCard/EmployeeDetailsCard";
+// import conformicon from "assets/ManagerMappingAndUnmappingAssets/conformicon";
+
+// import {
+//   getDepartments,
+//   getDesignationsByDepartment,
+//   getEmployeesByCampus,
+//   mapEmployeeGroup
+// } from "api/managerMapping/managerMapping";
+
+// const RemappingForm = ({ employee, onSuccess }) => {
+//   const [isSubmitted, setIsSubmitted] = useState(false);
+//   const [remappedData, setRemappedData] = useState(null);
+
+//   /* =========================
+//      FORM STATE
+//   ========================= */
+//   const [formData, setFormData] = useState({
+//     city: "",
+//     campus: "",
+//     department: "",
+//     designation: "",
+//     manager: null,
+//     reportingManager: null,
+//     workingStartDate: "",
+//     remarks: ""
+//   });
+
+//   /* =========================
+//      OPTIONS
+//   ========================= */
+//   const [departments, setDepartments] = useState([]);
+//   const [designations, setDesignations] = useState([]);
+//   const [employees, setEmployees] = useState([]);
+
+//   /* =========================
+//      AUTO POPULATE
+//   ========================= */
+//   useEffect(() => {
+//     if (!employee) return;
+
+//     setFormData(prev => ({
+//       ...prev,
+//       city: employee.city || "",
+//       campus: employee.campus?.name || "",
+//       department: employee.department || "",
+//       designation: employee.designation || "",
+//       workingStartDate: "",
+//       remarks: ""
+//     }));
+
+//     if (employee.campus?.id) {
+//       loadEmployees(employee.campus.id);
+//     }
+//   }, [employee]);
+
+//   /* =========================
+//      LOAD DEPARTMENTS
+//   ========================= */
+//   useEffect(() => {
+//     loadDepartments();
+//   }, []);
+
+//   const loadDepartments = async () => {
+//     const res = await getDepartments();
+//     setDepartments(
+//       (res || []).map(d => ({ label: d.name, value: d.id }))
+//     );
+//   };
+
+//   /* =========================
+//      DESIGNATIONS BY DEPT
+//   ========================= */
+//   useEffect(() => {
+//     const dept = departments.find(d => d.label === formData.department);
+//     if (dept) loadDesignations(dept.value);
+//     else setDesignations([]);
+//   }, [formData.department, departments]);
+
+//   const loadDesignations = async (departmentId) => {
+//     const res = await getDesignationsByDepartment(departmentId);
+//     setDesignations(
+//       (res || []).map(d => ({ label: d.name, value: d.id }))
+//     );
+//   };
+
+//   /* =========================
+//      EMPLOYEES BY CAMPUS
+//   ========================= */
+//   const loadEmployees = async (campusId) => {
+//     const res = await getEmployeesByCampus(campusId);
+//     setEmployees(
+//       (res || []).map(emp => ({
+//         label: emp.name,
+//         value: { id: emp.id, name: emp.name }
+//       }))
+//     );
+//   };
+
+//   /* =========================
+//      INPUT HANDLER
+//   ========================= */
+//   const handleInputChange = (e) => {
+//     if (e?.name) {
+//       setFormData(prev => ({ ...prev, [e.name]: e.value }));
+//       return;
+//     }
+//     const { name, value } = e.target;
+//     setFormData(prev => ({ ...prev, [name]: value }));
+//   };
+
+//   /* =========================
+//      SUBMIT
+//   ========================= */
+//   const handleSubmit = async (e) => {
+//     e.preventDefault();
+
+//     const payload = {
+//       cityId: employee.cityId,
+
+//       campusMappings: [
+//         {
+//           campusId: employee.campus.id,
+//           departmentId:
+//             departments.find(d => d.label === formData.department)?.value || 0,
+//           designationId:
+//             designations.find(d => d.label === formData.designation)?.value || 0,
+//           subjectId: 0
+//         }
+//       ],
+
+//       payrollIds: [String(employee.id)],
+
+//       managerId:
+//         employees.find(e => e.label === formData.manager)?.value?.id || 0,
+
+//       reportingManagerId:
+//         employees.find(e => e.label === formData.reportingManager)?.value?.id || 0,
+
+//       workStartingDate: formData.workingStartDate
+//         ? new Date(formData.workingStartDate).toISOString()
+//         : null,
+
+//       remark: formData.remarks || "",
+//       updatedBy: 5215
+//     };
+
+//     console.log("Remap Payload:", payload);
+
+//     try {
+//       await mapEmployeeGroup(payload);
+//       setRemappedData({
+//         ...employee,
+//         manager: formData.manager,
+//         reportingManager: formData.reportingManager
+//       });
+//       setIsSubmitted(true);
+//       onSuccess?.();
+//     } catch (err) {
+//       console.error("Remapping failed", err);
+//       alert("Failed to remap employee");
+//     }
+//   };
+
+//   /* =========================
+//      RENDER
+//   ========================= */
+//   return (
+//     <div className={styles.remappingFormSection}>
+//       {!isSubmitted ? (
+//         <>
+//           <h3 className={styles.remappingTitle}>Re-Mapping</h3>
+
+//           <form className={styles.remappingForm} onSubmit={handleSubmit}>
+//             {/* ✅ CITY (formerly Location) */}
+//             <Dropdown
+//               dropdownname="City"
+//               results={[formData.city]}
+//               value={formData.city}
+//               disabled
+//             />
+
+//             <Dropdown
+//               dropdownname="Campus"
+//               results={[formData.campus]}
+//               value={formData.campus}
+//               disabled
+//             />
+
+//             <Dropdown
+//               dropdownname="Department"
+//               results={departments.map(d => d.label)}
+//               value={formData.department}
+//               name="department"
+//               onChange={handleInputChange}
+//               dropdownsearch
+//             />
+
+//             <Dropdown
+//               dropdownname="Designation"
+//               results={designations.map(d => d.label)}
+//               value={formData.designation}
+//               name="designation"
+//               onChange={handleInputChange}
+//               dropdownsearch
+//             />
+
+//             <Dropdown
+//               dropdownname="Reporting Manager"
+//               results={employees.map(e => e.label)}
+//               value={formData.reportingManager}
+//               name="reportingManager"
+//               onChange={handleInputChange}
+//               dropdownsearch
+//             />
+
+//             <Dropdown
+//               dropdownname="Manager"
+//               results={employees.map(e => e.label)}
+//               value={formData.manager}
+//               name="manager"
+//               onChange={handleInputChange}
+//               dropdownsearch
+//             />
+
+//             <Inputbox
+//               label="Working Start Date"
+//               type="date"
+//               name="workingStartDate"
+//               value={formData.workingStartDate}
+//               onChange={handleInputChange}
+//             />
+
+//             <div className={styles.formGroup}>
+//               <label>Remarks</label>
+//               <textarea
+//                 name="remarks"
+//                 rows="4"
+//                 value={formData.remarks}
+//                 onChange={handleInputChange}
+//               />
+//             </div>
+
+//             <div className={styles.formActions}>
+//               <Button
+//                 buttonname="Confirm"
+//                 type="submit"
+//                 variant="primary"
+//                 righticon={conformicon}
+//                 width="142px"
+//               />
+//             </div>
+//           </form>
+//         </>
+//       ) : (
+//         remappedData && (
+//           <EmployeeDetailsCard employee={remappedData} hideHeader />
+//         )
+//       )}
+//     </div>
+//   );
+// };
+
+// export default RemappingForm;
 import React, { useState, useEffect } from "react";
 import styles from "./RemappingForm.module.css";
 
@@ -17,7 +288,7 @@ import {
 
 const RemappingForm = ({ employee, onSuccess }) => {
   const [isSubmitted, setIsSubmitted] = useState(false);
-  const [remappedData, setRemappedData] = useState(null);
+  const [comparisonData, setComparisonData] = useState(null); // 👈 New: Hold old + new data for comparison
 
   /* =========================
      FORM STATE
@@ -156,11 +427,20 @@ const RemappingForm = ({ employee, onSuccess }) => {
 
     try {
       await mapEmployeeGroup(payload);
-      setRemappedData({
+
+      // 👈 New: Prepare comparison data (old + new)
+      const oldData = { ...employee }; // Original employee data
+      const newData = {
         ...employee,
+        department: formData.department,
+        designation: formData.designation,
         manager: formData.manager,
-        reportingManager: formData.reportingManager
-      });
+        reportingManager: formData.reportingManager,
+        workingStartDate: formData.workingStartDate,
+        remarks: formData.remarks
+      };
+
+      setComparisonData({ old: oldData, new: newData });
       setIsSubmitted(true);
       onSuccess?.();
     } catch (err) {
@@ -260,8 +540,13 @@ const RemappingForm = ({ employee, onSuccess }) => {
           </form>
         </>
       ) : (
-        remappedData && (
-          <EmployeeDetailsCard employee={remappedData} hideHeader />
+        comparisonData && (
+          <EmployeeDetailsCard 
+            employee={comparisonData.old}  // 👈 Pass old data as base
+            comparisonData={comparisonData} // 👈 New: Pass full comparison data
+            showComparison={true} // 👈 New: Flag for comparison mode
+            hideHeader={false} 
+          />
         )
       )}
     </div>

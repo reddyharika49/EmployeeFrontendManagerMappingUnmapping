@@ -6,6 +6,8 @@ import styles from "./ManagerMappingSuccess.module.css";
 import Button from "widgets/Button/Button";
 // import successIcon from "assets/ManagerMappingAndUnmappingAssets/ReMapIcon.svg"; 
 import successAnimationData from 'assets/SkillTest/success-animation.json';
+import rightArrowIcon from "assets/managermappingsearch/rightarrow.jsx";
+import leftarrow from "assets/EmployeeOnBoarding/leftarrow";
 
 const ManagerMappingSuccess = ({ successTitle, onBack, onContinue }) => {
   return (
@@ -19,6 +21,7 @@ const ManagerMappingSuccess = ({ successTitle, onBack, onContinue }) => {
           <Button
             buttonname="Back"
             variant="secondary"
+            lefticon={leftarrow}
             width="140px"
             onClick={onBack}
           />
@@ -28,6 +31,7 @@ const ManagerMappingSuccess = ({ successTitle, onBack, onContinue }) => {
             variant="primary"
             width="260px"
             onClick={onContinue}
+            righticon={rightArrowIcon}
           />
         </div>
       </div>
