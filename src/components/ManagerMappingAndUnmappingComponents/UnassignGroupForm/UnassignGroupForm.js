@@ -1,3 +1,7 @@
+
+
+
+
 import React, { useEffect, useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import styles from "./UnassignGroupForm.module.css";
@@ -10,10 +14,13 @@ import leftarrow from "assets/EmployeeOnBoarding/leftarrow";
 
 import {
   fetchBatchCampusAddresses,
-  unmapEmployee
+  unmapMultipleEmployees
 } from "api/managerMapping/managerMapping";
 
 const UnassignGroupForm = () => {
+
+  // const [isSuccess, setIsSuccess] = useState(false);
+
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -115,25 +122,28 @@ const UnassignGroupForm = () => {
 
     const payload = {
       cityId: ids.cityId,
-      campusIds: [ids.campusId],          // ARRAY ✅
-      payrollIds: payrollIds,             // ✅ BULK array
+      campusIds: [ids.campusId],  
+      payrollId: payrollIds[0], 
+        // ARRAY ✅
+      payrollIds: payrollIds,             // ✅ FIXED (plural + array)
       managerId: ids.managerId,
       reportingManagerId: ids.reportingManagerId,
-      lastDate: formData.toDate,          // ✅ yyyy-MM-dd
-      remark: formData.remarks,
-      updatedBy: ids.managerId || 1       // use manager ID or fallback
+      lastDate: new Date(formData.toDate).toISOString(),
+      remark: formData.remarks,            // matches backend
+      updatedBy: 1
     };
 
     console.log("🚀 Unmap payload:", payload);
 
     try {
-      await unmapEmployee(payload);
-      navigate(-1);
+      await unmapMultipleEmployees(payload);
+     navigate(-1);
     } catch (err) {
       console.error("Unmap failed:", err);
       setError(err?.response?.data?.message || "Failed to unmap employees");
     }
   };
+
 
   return (
     <div className={styles.unassignGroupFormSection}>

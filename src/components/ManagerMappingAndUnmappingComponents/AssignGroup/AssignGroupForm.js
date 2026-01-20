@@ -11,45 +11,41 @@ import rightArrowIcon from "assets/managermappingsearch/rightarrow.jsx";
 import leftarrow from "assets/EmployeeOnBoarding/leftarrow";
 
 import {
-  getCities,
-  getCampusesByLocation,
   getDepartments,
   getDesignationsByDepartment,
   getEmployeesByCampus,
   mapEmployeeGroup
 } from "api/managerMapping/managerMapping";
 
-/* =========================
-   HELPERS
-========================= */
-const getIdByName = (list = [], name = "") =>
-  list.find(item => item.name === name)?.id || 0;
-
 const AssignGroupForm = () => {
+
+
   const navigate = useNavigate();
-  const location = useLocation();
+  const route = useLocation();
 
   /* =========================
      ROUTE STATE
   ========================= */
-  const payrollIds = location.state?.payrollIds || [];
-  const selectedEmployees = location.state?.selectedEmployees || [];
+  const payrollIds = route.state?.payrollIds || [];
+  const selectedEmployees = route.state?.selectedEmployees || [];
 
   /* =========================
-     ERROR STATE (NEW ✅)
+     ERROR STATE
   ========================= */
   const [error, setError] = useState("");
 
   /* =========================
-     FORM STATE
+     FORM STATE (IDS ONLY)
   ========================= */
   const [formData, setFormData] = useState({
-    location: "",
-    campus: "",
-    department: "",
-    position: "",
-    manager: "",
-    reportingManager: "",
+    cityId: null,
+    cityName: "",
+    campusId: null,
+    campusName: "",
+    departmentId: null,
+    designationId: null,
+    managerId: null,
+    reportingManagerId: null,
     workingStartDate: "",
     remarks: ""
   });
@@ -57,34 +53,19 @@ const AssignGroupForm = () => {
   /* =========================
      MASTER DATA
   ========================= */
-  const [locations, setLocations] = useState([]);
-  const [campuses, setCampuses] = useState([]);
   const [departments, setDepartments] = useState([]);
-  const [positions, setPositions] = useState([]);
+  const [designations, setDesignations] = useState([]);
   const [employees, setEmployees] = useState([]);
-
-  /* =========================
-     SELECTED CAMPUSES
-  ========================= */
-  const [selectedCampuses, setSelectedCampuses] = useState([]);
 
   /* =========================
      INITIAL LOAD
   ========================= */
   useEffect(() => {
-    const init = async () => {
-      const cityRes = await getCities();
-      const deptRes = await getDepartments();
-
-      setLocations(cityRes || []);
-      setDepartments(deptRes || []);
-    };
-
-    init();
+    getDepartments().then(res => setDepartments(res || []));
   }, []);
 
   /* =========================
-     VALIDATE SELECTED EMPLOYEES (NEW ✅)
+     AUTO POPULATE CITY & CAMPUS
   ========================= */
   useEffect(() => {
     if (!selectedEmployees.length) {
@@ -95,92 +76,52 @@ const AssignGroupForm = () => {
     const ref = selectedEmployees[0];
 
     const isSame = selectedEmployees.every(emp =>
-      emp.locationName === ref.locationName &&
-      emp.campusName === ref.campusName
+      emp.cityId === ref.cityId && emp.campusId === ref.campusId
     );
 
     if (!isSame) {
-      setError(
-        "Selected employees do not belong to the same Location / Campus"
-      );
+      setError("Selected employees must belong to same Location / Campus");
       return;
     }
 
-    /* AUTO-POPULATE */
     setFormData(prev => ({
       ...prev,
-      location: ref.locationName || "",
-      campus: ref.campusName || ""
+      cityId: ref.cityId,
+      cityName: ref.cityName,
+      campusId: ref.campusId,
+      campusName: ref.campusName
     }));
 
     setError("");
   }, [selectedEmployees]);
 
   /* =========================
-     LOAD CAMPUSES
-  ========================= */
-  useEffect(() => {
-    if (!formData.location || error) return;
-
-    const cityId = getIdByName(locations, formData.location);
-    if (!cityId) return;
-
-    const loadCampuses = async () => {
-      const res = await getCampusesByLocation(cityId);
-      setCampuses(res || []);
-    };
-
-    loadCampuses();
-  }, [formData.location, locations, error]);
-
-  /* =========================
      FETCH EMPLOYEES BY CAMPUS
   ========================= */
   useEffect(() => {
-    if (!formData.campus || !campuses.length || error) return;
+    if (!formData.campusId) return;
 
-    const campusId = getIdByName(campuses, formData.campus);
-    if (!campusId) return;
-
-    const loadEmployees = async () => {
-      const res = await getEmployeesByCampus(campusId);
-      setEmployees(res || []);
-    };
-
-    loadEmployees();
-
-    setSelectedCampuses([
-      { campusId, name: formData.campus }
-    ]);
-  }, [formData.campus, campuses, error]);
+    getEmployeesByCampus(formData.campusId)
+      .then(res => setEmployees(res || []));
+  }, [formData.campusId]);
 
   /* =========================
-     INPUT HANDLER
+     HANDLERS
   ========================= */
-  const handleInputChange = async (e) => {
-    const { name, value } = e.target;
+  const onDepartmentChange = async (e) => {
+    const dept = departments.find(d => d.name === e.target.value);
+    if (!dept) return;
 
     setFormData(prev => ({
       ...prev,
-      [name]: value
+      departmentId: dept.id,
+      designationId: null
     }));
 
-    if (name === "department") {
-      setPositions([]);
-
-      if (!value) return;
-
-      const deptId = getIdByName(departments, value);
-      if (!deptId) return;
-
-      const res = await getDesignationsByDepartment(deptId);
-      setPositions(res || []);
-    }
+    const res = await getDesignationsByDepartment(dept.id);
+    setDesignations(res || []);
   };
 
-  /* =========================
-     SUBMIT
-  ========================= */
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (error) return;
@@ -191,18 +132,18 @@ const AssignGroupForm = () => {
     }
 
     const payload = {
-      cityId: getIdByName(locations, formData.location),
-
-      campusMappings: selectedCampuses.map(c => ({
-        campusId: c.campusId,
-        departmentId: getIdByName(departments, formData.department),
-        designationId: getIdByName(positions, formData.position),
-        subjectId: 0
-      })),
-
+      cityId: formData.cityId,
       payrollIds,
-      managerId: getIdByName(employees, formData.manager),
-      reportingManagerId: getIdByName(employees, formData.reportingManager),
+      campusMappings: [
+        {
+          campusId: formData.campusId,
+          departmentId: formData.departmentId,
+          designationId: formData.designationId,
+          subjectId: 0
+        }
+      ],
+      managerId: formData.managerId,
+      reportingManagerId: formData.reportingManagerId,
       workStartingDate: new Date(formData.workingStartDate).toISOString(),
       remark: formData.remarks,
       updatedBy: 5212
@@ -210,7 +151,7 @@ const AssignGroupForm = () => {
 
     try {
       await mapEmployeeGroup(payload);
-      navigate(-1);
+      navigate(-1)
     } catch (err) {
       setError(err?.response?.data?.message || "Mapping failed");
     }
@@ -227,65 +168,96 @@ const AssignGroupForm = () => {
 
       <form className={styles.assignGroupForm} onSubmit={handleSubmit}>
         <div className={styles.formFieldsGrid}>
-          <Dropdown
-            dropdownname="Location"
-            results={locations.map(l => l.name)}
-            value={formData.location}
-            // disabled
+
+          {/* Location (City) */}
+          <Inputbox
+            label="Location"
+            value={formData.cityName}
+            disabled
           />
 
-          <Dropdown
-            dropdownname="Campus"
-            results={campuses.map(c => c.name)}
-            value={formData.campus}
-            // disabled
+          {/* Campus */}
+          <Inputbox
+            label="Campus"
+            value={formData.campusName}
+            disabled
           />
 
+          {/* Department */}
           <Dropdown
             dropdownname="Department"
             results={departments.map(d => d.name)}
-            name="department"
-            value={formData.department}
-            onChange={handleInputChange}
+            value={
+              departments.find(d => d.id === formData.departmentId)?.name || ""
+            }
+            onChange={onDepartmentChange}
             dropdownsearch
             disabled={!!error}
           />
 
+          {/* Designation */}
           <Dropdown
-            dropdownname="Position / Designation"
-            results={positions.map(p => p.name)}
-            name="position"
-            value={formData.position}
-            onChange={handleInputChange}
-            disabled={!formData.department || !!error}
+            dropdownname="Designation"
+            results={designations.map(d => d.name)}
+            value={
+              designations.find(d => d.id === formData.designationId)?.name || ""
+            }
+            onChange={(e) => {
+              const des = designations.find(d => d.name === e.target.value);
+              setFormData(prev => ({
+                ...prev,
+                designationId: des?.id || null
+              }));
+            }}
+            disabled={!formData.departmentId || !!error}
           />
 
+          {/* Manager */}
           <Dropdown
             dropdownname="Manager"
             results={employees.map(e => e.name)}
-            name="manager"
-            value={formData.manager}
-            onChange={handleInputChange}
+            value={
+              employees.find(e => e.id === formData.managerId)?.name || ""
+            }
+            onChange={(e) => {
+              const emp = employees.find(x => x.name === e.target.value);
+              setFormData(prev => ({
+                ...prev,
+                managerId: emp?.id || null
+              }));
+            }}
             dropdownsearch
             disabled={!!error}
           />
 
+          {/* Reporting Manager */}
           <Dropdown
             dropdownname="Reporting Manager"
             results={employees.map(e => e.name)}
-            name="reportingManager"
-            value={formData.reportingManager}
-            onChange={handleInputChange}
+            value={
+              employees.find(e => e.id === formData.reportingManagerId)?.name || ""
+            }
+            onChange={(e) => {
+              const emp = employees.find(x => x.name === e.target.value);
+              setFormData(prev => ({
+                ...prev,
+                reportingManagerId: emp?.id || null
+              }));
+            }}
             dropdownsearch
             disabled={!!error}
           />
 
           <Inputbox
             label="Working Start Date"
-            name="workingStartDate"
             type="date"
             value={formData.workingStartDate}
-            onChange={handleInputChange}
+            onChange={(e) =>
+              setFormData(prev => ({
+                ...prev,
+                workingStartDate: e.target.value
+              }))
+            }
             disabled={!!error}
           />
         </div>
@@ -293,29 +265,20 @@ const AssignGroupForm = () => {
         <div className={styles.selectedCampusesSection}>
           <label>Selected Campus</label>
           <div className={styles.selectedCampusesList}>
-            {selectedCampuses.length === 0 ? (
-              <div className={styles.emptyCampusState}>
-                <img src={iconSvg} alt="" />
-                <p>No campus selected</p>
-              </div>
-            ) : (
-              selectedCampuses.map(c => (
-                <div key={c.campusId} className={styles.campusChip}>
-                  {c.name}
-                </div>
-              ))
-            )}
+            <div className={styles.campusChip}>
+              {formData.campusName || "—"}
+            </div>
           </div>
         </div>
 
         <div className={styles.formGroup}>
           <label>Remarks</label>
           <textarea
-            name="remarks"
-            value={formData.remarks}
-            onChange={handleInputChange}
             rows="4"
-            disabled={!!error}
+            value={formData.remarks}
+            onChange={(e) =>
+              setFormData(prev => ({ ...prev, remarks: e.target.value }))
+            }
           />
         </div>
 

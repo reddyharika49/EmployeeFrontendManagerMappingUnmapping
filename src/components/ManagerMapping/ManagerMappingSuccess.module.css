@@ -1,0 +1,37 @@
+.successWrapper {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 80vh;
+    background-color: rgba(0, 0, 0, 0.1);
+  }
+  
+  .successCard {
+    background-color: #fff;
+    padding: 40px 30px;
+    border-radius: 16px;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+    text-align: center;
+    max-width: 450px;
+    width: 100%;
+  }
+  
+  .successCard img {
+    width: 80px;
+    margin-bottom: 20px;
+  }
+  
+  .successCard h3 {
+    margin-bottom: 30px;
+    font-size: 22px;
+    font-weight: 600;
+    color: #333;
+  }
+  
+  .actions {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    flex-wrap: wrap;
+  }
+  
