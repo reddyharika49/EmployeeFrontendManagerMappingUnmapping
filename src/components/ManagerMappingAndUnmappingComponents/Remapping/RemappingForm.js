@@ -286,7 +286,7 @@ import {
   mapEmployeeGroup
 } from "api/managerMapping/managerMapping";
 
-const RemappingForm = ({ employee, onSuccess }) => {
+const RemappingForm = ({ employee, onSuccess }) => { // 👈 onSuccess now from parent
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [comparisonData, setComparisonData] = useState(null); // 👈 New: Hold old + new data for comparison
 
@@ -442,7 +442,7 @@ const RemappingForm = ({ employee, onSuccess }) => {
 
       setComparisonData({ old: oldData, new: newData });
       setIsSubmitted(true);
-      onSuccess?.();
+      onSuccess?.(); // 👈 Call parent callback to hide initial card
     } catch (err) {
       console.error("Remapping failed", err);
       alert("Failed to remap employee");

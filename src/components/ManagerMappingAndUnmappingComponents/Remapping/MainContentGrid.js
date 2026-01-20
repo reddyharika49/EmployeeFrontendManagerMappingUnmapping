@@ -287,7 +287,6 @@
 // };
  
 // export default MainContentGrid;
- 
 import React, { useState, useEffect } from 'react';
 import styles from './MainContentGrid.module.css';
 import EmployeeDetailsCard from '../EmployeeDetailsCard/EmployeeDetailsCard';
@@ -333,7 +332,8 @@ const MainContentGrid = () => {
  
   const [employees, setEmployees] = useState([]);
   const [isAddEmployeePopupOpen, setIsAddEmployeePopupOpen] = useState(false);
- 
+  const [remappedEmployees, setRemappedEmployees] = useState(new Set()); // 👈 New: Track remapped employee IDs
+
   /* 🔹 Initial Load from Navigation State */
   useEffect(() => {
     if (selectedEmployees.length === 0) return;
@@ -387,6 +387,11 @@ const MainContentGrid = () => {
     // We pass true to indicate this is a new batch being appended
     fetchAndSetEmployees(newSelectedEmployees, true);
   };
+
+  /* 👈 New: Callback from RemappingForm to mark employee as remapped */
+  const handleRemapSuccess = (employeeId) => {
+    setRemappedEmployees(prev => new Set([...prev, employeeId]));
+  };
  
   return (
     <>
@@ -411,8 +416,18 @@ const MainContentGrid = () => {
         <div className={styles.employeeGrid}>
           {employees.map((employee, index) => (
             <div key={employee.id || index} className={styles.gridColumn}>
-              <EmployeeDetailsCard employee={employee} />
-              <RemappingForm employee={employee} />
+              {/* 👈 Conditionally hide initial card if remapped */}
+              {!remappedEmployees.has(employee.id) && (
+                <EmployeeDetailsCard 
+                  employee={employee} 
+                  hideHeader={false} 
+                  showComparison={false} // 👈 Explicitly non-comparison mode
+                />
+              )}
+              <RemappingForm 
+                employee={employee} 
+                onSuccess={() => handleRemapSuccess(employee.id)} // 👈 New: Notify parent on success
+              />
             </div>
           ))}
  

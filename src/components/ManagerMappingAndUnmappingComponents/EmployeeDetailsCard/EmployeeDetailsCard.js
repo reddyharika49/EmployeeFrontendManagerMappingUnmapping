@@ -181,7 +181,7 @@ import minMaxIcon from 'assets/ManagerMappingAndUnmappingAssets/minAndMaxIcon.sv
 import maximizeIcon from 'assets/ManagerMappingAndUnmappingAssets/Maximize.svg';
 import lineDecorator from 'assets/ManagerMappingAndUnmappingAssets/lineDecorator.svg';
 import successBadge from 'assets/ManagerMappingAndUnmappingAssets/UnMapScuccess.svg'; // Reuse or add your success icon
-import remapIcon from 'assets/ManagerMappingAndUnmappingAssets/UnMapScuccess.svg'; // 👈 Add remap icon import (↻ symbol)
+import remapIcon from 'assets/ManagerMappingAndUnmappingAssets/refresh-filled.svg'; // 👈 Add remap icon import (↻ symbol)
 
 const EmployeeDetailsCard = ({ 
   employee, 
