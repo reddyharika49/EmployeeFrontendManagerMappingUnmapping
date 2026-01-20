@@ -1,7 +1,3 @@
-
-
-
-
 import React, { useEffect, useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import styles from "./UnassignGroupForm.module.css";
@@ -11,15 +7,14 @@ import Button from "widgets/Button/Button";
 
 import rightArrowIcon from "assets/managermappingsearch/rightarrow.jsx";
 import leftarrow from "assets/EmployeeOnBoarding/leftarrow";
+import dividerLine from "assets/EmployeeOnBoarding/dividerline.svg";
 
 import {
   fetchBatchCampusAddresses,
   unmapMultipleEmployees
 } from "api/managerMapping/managerMapping";
 
-const UnassignGroupForm = () => {
-
-  // const [isSuccess, setIsSuccess] = useState(false);
+const UnassignGroupForm = ({ onSuccess }) => { // 👈 Added onSuccess prop from parent
 
   const navigate = useNavigate();
   const location = useLocation();
@@ -137,7 +132,7 @@ const UnassignGroupForm = () => {
 
     try {
       await unmapMultipleEmployees(payload);
-     navigate(-1);
+      if (onSuccess) onSuccess(); // 👈 Call parent callback on success instead of navigate
     } catch (err) {
       console.error("Unmap failed:", err);
       setError(err?.response?.data?.message || "Failed to unmap employees");
@@ -147,7 +142,14 @@ const UnassignGroupForm = () => {
 
   return (
     <div className={styles.unassignGroupFormSection}>
+      <div className={styles.header}>
       <h3 className={styles.unassignGroupTitle}>Un-Mapping</h3>
+      <img
+              src={dividerLine}
+              alt="divider"
+              className={styles.dividerImage}
+            />
+            </div>
 
       {error && <p className={styles.errorText}>{error}</p>}
 

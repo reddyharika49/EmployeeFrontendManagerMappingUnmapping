@@ -1,35 +1,33 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
+import Lottie from "lottie-react";
 import styles from "./ManagerMappingSuccess.module.css";
 
 import Button from "widgets/Button/Button";
-import successIcon from "assets/ManagerMappingAndUnmappingAssets/ReMapIcon.svg"; 
+// import successIcon from "assets/ManagerMappingAndUnmappingAssets/ReMapIcon.svg"; 
+import successAnimationData from 'assets/SkillTest/success-animation.json';
 
-const ManagerMappingSuccess = ({ setIsSuccess }) => {
-  const navigate = useNavigate();
-
+const ManagerMappingSuccess = ({ successTitle, onBack, onContinue }) => {
   return (
     <div className={styles.successWrapper}>
       <div className={styles.successCard}>
-        <img src={successIcon} alt="success" />
+      <Lottie animationData={successAnimationData} loop={false} />
 
-        <h3>Employees Un-mapped Successfully</h3>
+        <h3>{successTitle}</h3>
 
         <div className={styles.actions}>
           <Button
             buttonname="Back"
             variant="secondary"
             width="140px"
-            onClick={() => setIsSuccess(false)}
+            onClick={onBack}
           />
 
           <Button
             buttonname="Continue to Employee Management"
             variant="primary"
             width="260px"
-            onClick={() =>
-              navigate("/scopes/employee/employeeManager/manage")
-            }
+            onClick={onContinue}
           />
         </div>
       </div>

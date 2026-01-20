@@ -6,9 +6,10 @@ import Dropdown from "widgets/Dropdown/Dropdown";
 import Inputbox from "widgets/Inputbox/InputBox";
 import Button from "widgets/Button/Button";
 
-import iconSvg from "assets/ManagerMappingAndUnmappingAssets/icon.svg";
+// import iconSvg from "assets/ManagerMappingAndUnmappingAssets/.svg";
 import rightArrowIcon from "assets/managermappingsearch/rightarrow.jsx";
 import leftarrow from "assets/EmployeeOnBoarding/leftarrow";
+import dividerLine from "assets/EmployeeOnBoarding/dividerline.svg";
 
 import {
   getDepartments,
@@ -17,9 +18,7 @@ import {
   mapEmployeeGroup
 } from "api/managerMapping/managerMapping";
 
-const AssignGroupForm = () => {
-
-
+const AssignGroupForm = ({ onSuccess }) => { // 👈 Added onSuccess prop from parent
   const navigate = useNavigate();
   const route = useLocation();
 
@@ -151,18 +150,25 @@ const AssignGroupForm = () => {
 
     try {
       await mapEmployeeGroup(payload);
-      navigate(-1)
+      if (onSuccess) onSuccess(); // 👈 Call parent callback on success instead of local state
     } catch (err) {
       setError(err?.response?.data?.message || "Mapping failed");
     }
   };
 
   /* =========================
-     RENDER
+     RENDER - Always render form (success handled in parent)
   ========================= */
   return (
     <div className={styles.assignGroupFormSection}>
+      <div className={styles.header}>
       <h3 className={styles.assignGroupTitle}>Re-Mapping</h3>
+      <img
+              src={dividerLine}
+              alt="divider"
+              className={styles.dividerImage}
+            />
+            </div>
 
       {error && <p className={styles.errorText}>{error}</p>}
 
@@ -262,14 +268,14 @@ const AssignGroupForm = () => {
           />
         </div>
 
-        <div className={styles.selectedCampusesSection}>
+        {/* <div className={styles.selectedCampusesSection}>
           <label>Selected Campus</label>
           <div className={styles.selectedCampusesList}>
             <div className={styles.campusChip}>
               {formData.campusName || "—"}
             </div>
           </div>
-        </div>
+        </div> */}
 
         <div className={styles.formGroup}>
           <label>Remarks</label>

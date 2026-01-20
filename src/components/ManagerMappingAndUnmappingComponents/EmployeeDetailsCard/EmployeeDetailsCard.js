@@ -10,18 +10,14 @@ import minMaxIcon from 'assets/ManagerMappingAndUnmappingAssets/minAndMaxIcon.sv
 import maximizeIcon from 'assets/ManagerMappingAndUnmappingAssets/Maximize.svg';
 import lineDecorator from 'assets/ManagerMappingAndUnmappingAssets/lineDecorator.svg';
 import successBadge from 'assets/ManagerMappingAndUnmappingAssets/UnMapScuccess.svg'; // Reuse or add your success icon
-
 const EmployeeDetailsCard = ({ employee, hideHeader = false, isUnmapped = false }) => {
   const [isCollapsed, setIsCollapsed] = useState(false);
-
   const phoneNumber = employee?.emergencyContact?.phoneNumber || employee?.phoneNumber || "+91 9949522639";
   const email = employee?.emergencyContact?.email || employee?.email || "support@school.com";
-
   const handleToggle = (e) => {
     e.stopPropagation();
     setIsCollapsed(!isCollapsed);
   };
-
   const employeeData = employee || {
     id: 'HYD 5627182',
     name: 'Devansh.N',
@@ -33,7 +29,6 @@ const EmployeeDetailsCard = ({ employee, hideHeader = false, isUnmapped = false 
     manager: 'Raja',
     project: 'IPL'
   };
-
   return (
     <div className={`${styles.employeeDetailsCard} ${isUnmapped ? styles.successCardBorder : ''}`}>
       {!hideHeader && (
@@ -59,7 +54,6 @@ const EmployeeDetailsCard = ({ employee, hideHeader = false, isUnmapped = false 
           </div>
         </>
       )}
-
       <div className={styles.campusDetailsWrapper}>
         {!isUnmapped ? (
           <>
@@ -101,8 +95,8 @@ const EmployeeDetailsCard = ({ employee, hideHeader = false, isUnmapped = false 
                   componentsProps={{
                     tooltip: {
                       sx: {
-                        backgroundColor: "#FFF",   // custom tooltip background
-                        color: "#3425FF",          // tooltip text color
+                        backgroundColor: "#FFF", // custom tooltip background
+                        color: "#3425FF", // tooltip text color
                         fontSize: "0.75rem",
                         fontWeight: 500,
                         padding: "6px 10px",
@@ -140,7 +134,6 @@ const EmployeeDetailsCard = ({ employee, hideHeader = false, isUnmapped = false 
                   </div>
                 </div>
               </div>
-
               {/* Reporting Manager Section */}
               <div className={`${styles.reportingManagerSection} ${isCollapsed ? styles.reportingManagerSectionHidden : ''}`}>
                 <div className={styles.managerLeft}>
@@ -174,7 +167,6 @@ const EmployeeDetailsCard = ({ employee, hideHeader = false, isUnmapped = false 
     </div>
   );
 };
-
 export default EmployeeDetailsCard;
 
 

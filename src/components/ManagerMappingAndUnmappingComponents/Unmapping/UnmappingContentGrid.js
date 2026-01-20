@@ -1,16 +1,12 @@
 import React, { useState, useEffect } from "react";
 import styles from "../Remapping/MainContentGrid.module.css";
-
 import EmployeeDetailsCard from "../EmployeeDetailsCard/EmployeeDetailsCard";
 import AddEmployeeWidget from "widgets/ManagerMappingAndUnmappingWidgets/AddNewEmployee(Blank)/AddEmployeeWidget";
 import UnmappingForm from "./UnmappingForm";
 import AddNewEmployeePopup from "../AddNewEmployeePopup/AddNewEmployeePopup";
-
 import backarrow from "assets/managermappingsearch/topleftarrow.svg";
 import { useNavigate, useLocation } from "react-router-dom";
-
 import { fetchBatchCampusAddresses } from "api/managerMapping/managerMapping";
-
 /* 🔁 Merge selected card + API data */
 const convertEmployeeToGridFormat = (emp, apiData = {}) => {
   return {
@@ -35,28 +31,31 @@ const convertEmployeeToGridFormat = (emp, apiData = {}) => {
     project: emp.projectName || "—"
   };
 };
-
 const UnmappingContentGrid = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const goBack = () => navigate(-1);
-
   const selectedEmployees = location.state?.selectedEmployees || [];
-
   const [employees, setEmployees] = useState([]);
   const [isAddEmployeePopupOpen, setIsAddEmployeePopupOpen] = useState(false);
   
-  /** * 🎯 Logic for UI Change: 
+  /** * 🎯 Logic for UI Change:
    * We keep an array of IDs that have been successfully unmapped.
    */
   const [unmappedEmployees, setUnmappedEmployees] = useState([]);
-
+  
+  const handleUnmapSuccess = (payrollId) => {
+    setUnmappedEmployees((prev) => [...prev, payrollId]);
+  };
+  
+  const handleResetUnmap = (payrollId) => {
+    setUnmappedEmployees((prev) => prev.filter(id => id !== payrollId));
+  };
+  
   /* 🔹 Initial load – selected employees */
   useEffect(() => {
     if (selectedEmployees.length === 0) return;
-
     const payrollIds = selectedEmployees.map(emp => emp.payRollId);
-
     fetchBatchCampusAddresses(payrollIds)
       .then(res => {
         const apiResponse = res.data || [];
@@ -64,73 +63,27 @@ const UnmappingContentGrid = () => {
         apiResponse.forEach(item => {
           apiMap[item.payrollId] = item;
         });
-
         const mergedEmployees = selectedEmployees.map(emp =>
           convertEmployeeToGridFormat(emp, apiMap[emp.payRollId])
         );
-
         setEmployees(mergedEmployees);
       })
       .catch(err => {
         console.error("Failed to fetch campus details", err);
       });
   }, [selectedEmployees]);
-
   /* 🔹 Add employee popup */
   const handleAddEmployeeClick = () => {
     setIsAddEmployeePopupOpen(true);
   };
-
-  /* 🔹 Handle Success from UnmappingForm */
-  const handleUnmapSuccess = (payrollId) => {
-    setUnmappedEmployees((prev) => [...prev, payrollId]);
-  };
-
-  /* 🔹 Add more employees */
-  // const handleAddEmployees = (newSelectedEmployees) => {
-  //   const normalizedEmployees = newSelectedEmployees.map(emp => ({
-  //     payRollId: emp.id,
-  //     empId: emp.empId,
-  //     empName: emp.name,
-  //     departmentName: emp.dept,
-  //     employeeTypeName: emp.level,
-  //     modeOfHiringName: emp.status,
-  //     campusId: emp.campusId,
-  //     campusName: emp.campusName
-  //   }));
-  
-  //   const payrollIds = normalizedEmployees.map(emp => emp.payRollId);
-  
-  //   fetchBatchCampusAddresses(payrollIds)
-  //     .then(res => {
-  //       const apiMap = {};
-  //       res.data.forEach(item => {
-  //         apiMap[item.payrollId] = item;
-  //       });
-  
-  //       const formatted = normalizedEmployees.map(emp =>
-  //         convertEmployeeToGridFormat(emp, apiMap[emp.payRollId])
-  //       );
-  
-  //       // ✅ ADD HERE (replace old setEmployees)
-  //       setEmployees(prev => {
-  //         const existingIds = new Set(prev.map(e => e.id));
-  //         const filtered = formatted.filter(e => !existingIds.has(e.id));
-  //         return [...prev, ...filtered];
-  //       });
-  //     })
-  //     .catch(err => {
-  //       console.error("Failed to fetch additional employees", err);
-  //     });
-  // };
   
   const handleAddEmployees = (newSelectedEmployees) => {
     // 1. Map the popup data back to the format the 'convert' helper expects
     const normalizedEmployees = newSelectedEmployees.map(emp => ({
-      payRollId: emp.id,           // convert helper looks for payRollId
+      payRollId: emp.id, // convert helper looks for payRollId
       empId: emp.empId,
-      empName: emp.name,           // convert helper looks for empName
-      departmentName: emp.dept,    // convert helper looks for departmentName
+      empName: emp.name, // convert helper looks for empName
+      departmentName: emp.dept, // convert helper looks for departmentName
       employeeTypeName: emp.level, // convert helper looks for employeeTypeName
       modeOfHiringName: emp.status,// convert helper looks for modeOfHiringName
       campusId: emp.campusId,
@@ -142,7 +95,7 @@ const UnmappingContentGrid = () => {
     fetchBatchCampusAddresses(payrollIds)
       .then(res => {
         // res.data should be an array. Ensure it exists.
-        const apiResponse = res.data || []; 
+        const apiResponse = res.data || [];
         const apiMap = {};
         apiResponse.forEach(item => {
           apiMap[item.payrollId] = item;
@@ -160,7 +113,6 @@ const UnmappingContentGrid = () => {
       })
       .catch(err => console.error("Failed to fetch details", err));
   };
-
   return (
     <div className={styles.mainContentGrid}>
       {/* Header */}
@@ -176,36 +128,33 @@ const UnmappingContentGrid = () => {
           <p className={styles.subtitle}>Unmap each of employees</p>
         </div>
       </div>
-
       {/* Grid */}
       <div className={styles.employeeGrid}>
         {employees.map((employee, index) => {
           // Check if this specific employee is unmapped
           const isSuccess = unmappedEmployees.includes(employee.id);
-
           return (
             <div key={employee.id || index} className={styles.gridColumn}>
               {/* Pass the success state to the Card to hide Campus Details */}
-              <EmployeeDetailsCard 
-                employee={employee} 
-                isUnmapped={isSuccess} 
+              <EmployeeDetailsCard
+                employee={employee}
+                isUnmapped={isSuccess}
               />
               
               {/* Pass success state and the handler to the Form */}
-              <UnmappingForm 
-                employee={employee} 
+              <UnmappingForm
+                employee={employee}
                 onSuccess={() => handleUnmapSuccess(employee.id)}
+                onResetUnmap={() => handleResetUnmap(employee.id)}
                 isUnmapped={isSuccess}
               />
             </div>
           );
         })}
-
         <div className={styles.gridColumn}>
           <AddEmployeeWidget onClick={handleAddEmployeeClick} />
         </div>
       </div>
-
       {/* Popup */}
       <AddNewEmployeePopup
         isOpen={isAddEmployeePopupOpen}
@@ -215,7 +164,6 @@ const UnmappingContentGrid = () => {
     </div>
   );
 };
-
 export default UnmappingContentGrid;
 //Updated
 

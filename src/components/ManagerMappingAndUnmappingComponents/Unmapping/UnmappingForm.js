@@ -155,9 +155,8 @@ import reMapIcon from "assets/ManagerMappingAndUnmappingAssets/ReMapIcon.svg";
 import UnmapIcon from "assets/ManagerMappingAndUnmappingAssets/Unmap(Icon).svg";
 import { unmapEmployee } from "api/managerMapping/managerMapping";
 import RemappingForm from "../Remapping/RemappingForm";
-import EmployeeDetailsCard from "../EmployeeDetailsCard/EmployeeDetailsCard";
 
-const UnmappingForm = ({ employee, onSuccess, isUnmapped }) => {
+const UnmappingForm = ({ employee, onSuccess, isUnmapped, onResetUnmap }) => {
   const [formData, setFormData] = useState({
     payrollId: "",
     cityId: null,
@@ -171,22 +170,12 @@ const UnmappingForm = ({ employee, onSuccess, isUnmapped }) => {
     managerName: "",
     reportingManagerName: ""
   });
-
   const [loading, setLoading] = useState(false);
   const [showRemap, setShowRemap] = useState(false);
-
-  // 🔹 Local state to override the parent's isUnmapped prop
-  const [internalIsUnmapped, setInternalIsUnmapped] = useState(isUnmapped);
-
-  // Sync internal state with prop
-  useEffect(() => {
-    setInternalIsUnmapped(isUnmapped);
-  }, [isUnmapped]);
 
   // 🔹 Auto-fill IDs and names
   useEffect(() => {
     if (!employee) return;
-
     setFormData(prev => ({
       ...prev,
       payrollId: employee.id,
@@ -202,7 +191,6 @@ const UnmappingForm = ({ employee, onSuccess, isUnmapped }) => {
       reportingManagerName: employee.reportingManager || "—"
     }));
   }, [employee]);
-
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData(prev => ({
@@ -210,15 +198,12 @@ const UnmappingForm = ({ employee, onSuccess, isUnmapped }) => {
       [name]: value
     }));
   };
-
   const handleSubmit = async (e) => {
     e.preventDefault();
-
     if (!employee.campus?.id) {
       alert("Campus mapping not found. Please reselect employee.");
       return;
     }
-
     const payload = {
       payrollId: employee.id,
       cityId: employee.cityId,
@@ -229,7 +214,6 @@ const UnmappingForm = ({ employee, onSuccess, isUnmapped }) => {
       remark: formData.remark,
       updatedBy: 1
     };
-
     try {
       setLoading(true);
       await unmapEmployee(payload);
@@ -241,14 +225,13 @@ const UnmappingForm = ({ employee, onSuccess, isUnmapped }) => {
       setLoading(false);
     }
   };
-
   const handleStartRemap = () => {
-    setInternalIsUnmapped(false); // Kill the success state locally
+    // Reset the parent's unmap success state to show campus details again
+    if (onResetUnmap) onResetUnmap();
     setShowRemap(true);
   };
-
   // 🔹 1. Show Re-map button after successful unmap
-  if (internalIsUnmapped && !showRemap) {
+  if (isUnmapped && !showRemap) {
     return (
       <div className={styles.remapButtonWrapper}>
         <Button
@@ -261,28 +244,14 @@ const UnmappingForm = ({ employee, onSuccess, isUnmapped }) => {
       </div>
     );
   }
-
-  // 🔹 2. Show Remapping form (This is where your issue was)
+  // 🔹 2. Show Remapping form (no extra card needed; original card will show details after reset)
   if (showRemap) {
-    return (
-      <div key="remapping-session-wrapper"> {/* Key on wrapper helps too */}
-        <EmployeeDetailsCard
-          key={employee?.id || "remap-card"} // 👈 THIS IS THE FIX
-          employee={employee}
-          hideHeader={true}
-          isUnmapped={false}
-          hideSuccess={true}
-        />
-        <RemappingForm employee={employee} />
-      </div>
-    );
+    return <RemappingForm employee={employee} />;
   }
-
   // 🔹 3. Default Unmapping Form
   return (
     <div className={styles.remappingFormSection}>
       <h3 className={styles.remappingTitle}>Un-Mapping</h3>
-
       <form className={styles.remappingForm} onSubmit={handleSubmit}>
         <Inputbox
           label="To Date"
@@ -292,7 +261,6 @@ const UnmappingForm = ({ employee, onSuccess, isUnmapped }) => {
           onChange={handleChange}
           required
         />
-
         <Inputbox label="Location" name="cityName" value={formData.cityName} disabled />
         <Inputbox
           label="Shared Campus"
@@ -307,7 +275,6 @@ const UnmappingForm = ({ employee, onSuccess, isUnmapped }) => {
           value={formData.reportingManagerName}
           disabled
         />
-
         <div className={styles.formGroup}>
           <label>Remarks</label>
           <textarea
@@ -318,7 +285,6 @@ const UnmappingForm = ({ employee, onSuccess, isUnmapped }) => {
             placeholder="Enter remark"
           />
         </div>
-
         <div className={styles.formActions}>
           <Button
             buttonname={loading ? "Processing..." : "Confirm"}
@@ -333,5 +299,4 @@ const UnmappingForm = ({ employee, onSuccess, isUnmapped }) => {
     </div>
   );
 };
-
 export default UnmappingForm;
